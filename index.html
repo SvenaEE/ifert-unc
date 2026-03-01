@@ -42,7 +42,6 @@
     overflow-x: hidden;
   }
 
-  /* ── GRID BACKGROUND ── */
   body::before {
     content: '';
     position: fixed;
@@ -55,7 +54,6 @@
     z-index: 0;
   }
 
-  /* ── NOISE OVERLAY ── */
   body::after {
     content: '';
     position: fixed;
@@ -74,7 +72,6 @@
     padding: 0 24px 80px;
   }
 
-  /* ── HEADER ── */
   header {
     padding: 52px 0 40px;
     display: flex;
@@ -182,7 +179,6 @@
     color: var(--muted);
   }
 
-  /* ── SCORE RING + STATS ── */
   .score-section {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -300,7 +296,7 @@
     margin-top: 4px;
   }
 
-  /* ── PROGRESS BAR ── */
+ 
   .progress-bar-wrap {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -521,7 +517,6 @@
   .filter-btn:hover { border-color: var(--accent); color: var(--accent2); }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-  /* ── SHARE BAR ── */
   .share-bar {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -576,7 +571,6 @@
   .copy-btn:hover { background: var(--accent2); }
   .copy-btn.copied { background: var(--green2); }
 
-  /* ── EMPTY / LOADING ── */
   .empty-state {
     text-align: center;
     padding: 80px 24px;
@@ -637,12 +631,10 @@
     margin-left: 12px;
   }
 
-  /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
 
-  /* ── DEMO PULSE ── */
   .demo-tag {
     display: inline-flex;
     align-items: center;
@@ -669,7 +661,6 @@
     50% { opacity: 0.4; transform: scale(0.7); }
   }
 
-  /* animation delays for rows */
   .results-list .result-row:nth-child(1)  { animation-delay: 0.00s; }
   .results-list .result-row:nth-child(2)  { animation-delay: 0.03s; }
   .results-list .result-row:nth-child(3)  { animation-delay: 0.06s; }
@@ -694,18 +685,13 @@
     </div>
     <div class="header-tag">v3.1</div>
   </header>
-
-  <!-- Main content (shown when results loaded) -->
   <div id="results-view" style="display:none">
-
-    <!-- Share bar -->
     <div class="share-bar" id="share-bar" style="display:none">
       <span class="share-label">Share</span>
       <span class="share-url" id="share-url"></span>
       <button class="copy-btn" id="copy-btn" onclick="copyURL()">Copy Link</button>
     </div>
 
-    <!-- Executor card -->
     <div class="executor-card">
       <div class="executor-glow"></div>
       <div class="exec-label">Executor Identified</div>
@@ -1035,9 +1021,7 @@ function loadPasted() {
   }
 }
 
-// ══════════════════════════════════════
-//  DEMO DATA
-// ══════════════════════════════════════
+
 function loadDemo() {
   const demo = {
     executor: "Synapse X",
@@ -1195,19 +1179,15 @@ function animCount(el, from, to, duration, fmt) {
   requestAnimationFrame(step);
 }
 
-// ══════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════
+
+
 window.addEventListener('load', () => {
   if (!loadFromURL()) {
     document.getElementById('empty-view').style.display = 'block';
   }
 });
 
-// ── Expose global for Lua to call via synapse/http ──────────
-// The Lua script will POST JSON to a local endpoint OR encode results
-// into the URL directly (recommended approach since no server needed).
-// This function can also be called programmatically:
+
 window.IFertLoad = function(data) {
   renderResults(data);
   const url = buildShareURL(data);
