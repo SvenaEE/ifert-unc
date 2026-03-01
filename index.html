@@ -1,2233 +1,1219 @@
---[[
-    IFert UNC Environment Checker  v3.1
-    150+ Anti-Fake Tests  |  Frosted Glass Theme
-    Bigger Window  |  Dropdown Overflow Fixed
-]]
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFert — UNC Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0b0f;
+    --bg2:      #0f1117;
+    --bg3:      #151820;
+    --surface:  #1a1e2a;
+    --surface2: #1f2435;
+    --border:   #252b3d;
+    --border2:  #2e364d;
+    --text:     #e8eaf0;
+    --muted:    #7a8099;
+    --dim:      #4a5068;
+    --accent:   #5b7cff;
+    --accent2:  #7c9aff;
+    --green:    #3ddc97;
+    --green2:   #2ab87e;
+    --red:      #ff5f5f;
+    --red2:     #cc4040;
+    --yellow:   #ffc14a;
+    --yellow2:  #cc9428;
+    --mono:     'JetBrains Mono', monospace;
+    --sans:     'Space Grotesk', sans-serif;
+  }
 
-local Players      = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local UIS          = game:GetService("UserInputService")
-local CoreGui      = game:GetService("CoreGui")
-local HttpService  = game:GetService("HttpService")
-local RunService   = game:GetService("RunService")
-local LP           = Players.LocalPlayer
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-if CoreGui:FindFirstChild("IFert_UNC") then CoreGui:FindFirstChild("IFert_UNC"):Destroy() end
+  html { scroll-behavior: smooth; }
 
--- ═══════════════════════════════════
---  THEME
--- ═══════════════════════════════════
-local T = {
-    BG          = Color3.fromRGB(243,243,247),
-    Surface     = Color3.fromRGB(255,255,255),
-    SurfaceHigh = Color3.fromRGB(230,230,237),
-    Border      = Color3.fromRGB(198,198,212),
-    Text        = Color3.fromRGB(24, 24, 38),
-    TextDim     = Color3.fromRGB(95, 95,118),
-    TextMuted   = Color3.fromRGB(155,155,173),
-    Accent      = Color3.fromRGB(82, 106,208),
-    AccentHov   = Color3.fromRGB(105,128,228),
-    AccentDim   = Color3.fromRGB(142,158,222),
-    Success     = Color3.fromRGB(28, 152, 72),
-    Fail        = Color3.fromRGB(202, 52, 52),
-    Warn        = Color3.fromRGB(190,130, 12),
-    Info        = Color3.fromRGB(82, 106,208),
-    Console     = Color3.fromRGB(247,247,251),
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── GRID BACKGROUND ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(91,124,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,124,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 52px 0 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .logo span {
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--dim);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── EXECUTOR CARD ── */
+  .executor-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .executor-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 40%, var(--accent2) 60%, transparent);
+    opacity: 0.6;
+  }
+
+  .executor-glow {
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(91,124,255,0.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  .exec-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .exec-name {
+    font-family: var(--mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .exec-meta {
+    display: flex;
+    gap: 20px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .exec-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .exec-meta-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .exec-meta-value {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ── SCORE RING + STATS ── */
+  .score-section {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 28px;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+
+  @media (max-width: 600px) {
+    .score-section { grid-template-columns: 1fr; }
+    .ring-wrap { justify-self: center; }
+  }
+
+  .ring-wrap {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    flex-shrink: 0;
+  }
+
+  .ring-wrap svg {
+    transform: rotate(-90deg);
+    width: 100%;
+    height: 100%;
+  }
+
+  .ring-bg {
+    fill: none;
+    stroke: var(--surface2);
+    stroke-width: 10;
+  }
+
+  .ring-fg {
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 408;
+    stroke-dashoffset: 408;
+    transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .ring-pct {
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .ring-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .stat-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-box::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .stat-box.pass::after  { background: var(--green);  }
+  .stat-box.fail::after  { background: var(--red);    }
+  .stat-box.notest::after{ background: var(--dim);    }
+  .stat-box.alias::after { background: var(--yellow); }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .stat-box.pass .stat-num  { color: var(--green);  }
+  .stat-box.fail .stat-num  { color: var(--red);    }
+  .stat-box.notest .stat-num{ color: var(--muted);  }
+  .stat-box.alias .stat-num { color: var(--yellow); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 28px;
+  }
+
+  .progress-bar-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .progress-track {
+    height: 8px;
+    background: var(--bg3);
+    border-radius: 99px;
+    overflow: hidden;
+    display: flex;
+  }
+
+  .progress-pass {
+    height: 100%;
+    background: var(--green);
+    border-radius: 99px 0 0 99px;
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
+    width: 0;
+  }
+
+  .progress-fail {
+    height: 100%;
+    background: var(--red);
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.1s;
+    width: 0;
+  }
+
+  .progress-notest {
+    height: 100%;
+    background: var(--surface2);
+    border-radius: 0 99px 99px 0;
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.2s;
+    width: 0;
+  }
+
+  .progress-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .leg-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── RESULTS LIST ── */
+  .section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .results-list {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 28px;
+  }
+
+  .result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    font-family: var(--mono);
+    font-size: 12px;
+    transition: background 0.15s, border-color 0.15s;
+    cursor: default;
+    animation: fadeIn 0.3s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-row:hover {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .result-row.pass  { }
+  .result-row.fail  { }
+  .result-row.notest{ }
+
+  .result-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .result-icon.pass  { background: rgba(61,220,151,0.15); color: var(--green); }
+  .result-icon.fail  { background: rgba(255,95,95,0.15);  color: var(--red);   }
+  .result-icon.notest{ background: rgba(74,80,104,0.2);   color: var(--dim);   }
+  .result-icon.alias { background: rgba(255,193,74,0.15); color: var(--yellow);}
+
+  .result-name {
+    flex: 1;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .result-row.fail .result-name  { color: var(--red);    }
+  .result-row.notest .result-name{ color: var(--muted);  }
+
+  .result-msg {
+    font-size: 10px;
+    color: var(--dim);
+    flex: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .result-cat {
+    font-size: 9px;
+    color: var(--dim);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  /* category header */
+  .cat-header {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 14px 0 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cat-header::before {
+    content: '▸';
+    font-size: 9px;
+  }
+
+  .cat-header-line {
+    flex: 1; height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FILTERS ── */
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent2); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── SHARE BAR ── */
+  .share-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+
+  .share-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .share-url {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent2);
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: text;
+    user-select: all;
+  }
+
+  .copy-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 7px 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .copy-btn:hover { background: var(--accent2); }
+  .copy-btn.copied { background: var(--green2); }
+
+  /* ── EMPTY / LOADING ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 24px;
+  }
+
+  .empty-icon {
+    font-family: var(--mono);
+    font-size: 48px;
+    color: var(--dim);
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  .empty-title {
+    font-family: var(--mono);
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .empty-sub {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--dim);
+    line-height: 1.7;
+  }
+
+  .empty-sub code {
+    color: var(--accent2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  /* ── TIMESTAMP ── */
+  .timestamp {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--dim);
+    text-align: center;
+    margin-top: 16px;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── GRADE BADGE ── */
+  .grade-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 700;
+    margin-left: 12px;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  /* ── DEMO PULSE ── */
+  .demo-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--yellow);
+    background: rgba(255,193,74,0.1);
+    border: 1px solid rgba(255,193,74,0.25);
+    padding: 3px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.08em;
+  }
+
+  .pulse {
+    width: 5px; height: 5px;
+    background: var(--yellow);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* animation delays for rows */
+  .results-list .result-row:nth-child(1)  { animation-delay: 0.00s; }
+  .results-list .result-row:nth-child(2)  { animation-delay: 0.03s; }
+  .results-list .result-row:nth-child(3)  { animation-delay: 0.06s; }
+  .results-list .result-row:nth-child(4)  { animation-delay: 0.09s; }
+  .results-list .result-row:nth-child(5)  { animation-delay: 0.12s; }
+  .results-list .result-row:nth-child(6)  { animation-delay: 0.15s; }
+  .results-list .result-row:nth-child(7)  { animation-delay: 0.18s; }
+  .results-list .result-row:nth-child(8)  { animation-delay: 0.21s; }
+  .results-list .result-row:nth-child(9)  { animation-delay: 0.24s; }
+  .results-list .result-row:nth-child(10) { animation-delay: 0.27s; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="logo"><span>I</span>FERT — UNC Checker</div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:0.05em;">
+        Universal Naming Convention Results Dashboard
+      </div>
+    </div>
+    <div class="header-tag">v3.1</div>
+  </header>
+
+  <!-- Main content (shown when results loaded) -->
+  <div id="results-view" style="display:none">
+
+    <!-- Share bar -->
+    <div class="share-bar" id="share-bar" style="display:none">
+      <span class="share-label">Share</span>
+      <span class="share-url" id="share-url"></span>
+      <button class="copy-btn" id="copy-btn" onclick="copyURL()">Copy Link</button>
+    </div>
+
+    <!-- Executor card -->
+    <div class="executor-card">
+      <div class="executor-glow"></div>
+      <div class="exec-label">Executor Identified</div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div class="exec-name" id="exec-name">—</div>
+        <div class="grade-badge" id="grade-badge"></div>
+      </div>
+      <div class="exec-meta">
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Version</span>
+          <span class="exec-meta-value" id="exec-version">—</span>
+        </div>
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Thread Identity</span>
+          <span class="exec-meta-value" id="exec-identity">—</span>
+        </div>
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Total Tests</span>
+          <span class="exec-meta-value" id="exec-total">—</span>
+        </div>
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Tested On</span>
+          <span class="exec-meta-value" id="exec-date">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score + stats -->
+    <div class="score-section">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 146 146">
+          <circle class="ring-bg" cx="73" cy="73" r="65"/>
+          <circle class="ring-fg" id="ring-fg" cx="73" cy="73" r="65"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-sub">pass rate</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box pass">
+          <div class="stat-num" id="stat-pass">0</div>
+          <div class="stat-label">✅ Passed</div>
+        </div>
+        <div class="stat-box fail">
+          <div class="stat-num" id="stat-fail">0</div>
+          <div class="stat-label">⛔ Failed</div>
+        </div>
+        <div class="stat-box notest">
+          <div class="stat-num" id="stat-notest">0</div>
+          <div class="stat-label">⏺ No Test</div>
+        </div>
+        <div class="stat-box alias">
+          <div class="stat-num" id="stat-alias">0</div>
+          <div class="stat-label">⚠ Alias Warn</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">Result breakdown</div>
+      <div class="progress-track">
+        <div class="progress-pass"  id="prog-pass"></div>
+        <div class="progress-fail"  id="prog-fail"></div>
+        <div class="progress-notest" id="prog-notest"></div>
+      </div>
+      <div class="progress-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Passed</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Failed</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--surface2)"></div>No Test</div>
+      </div>
+    </div>
+
+    <!-- Results list -->
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('pass',this)">Passed</button>
+      <button class="filter-btn" onclick="setFilter('fail',this)">Failed</button>
+      <button class="filter-btn" onclick="setFilter('notest',this)">No Test</button>
+    </div>
+
+    <div class="section-title">Test Results</div>
+    <div class="results-list" id="results-list"></div>
+
+    <div class="timestamp" id="timestamp"></div>
+  </div>
+
+  <!-- Empty state (no results yet) -->
+  <div id="empty-view">
+    <div class="empty-state">
+      <span class="empty-icon">⬡</span>
+      <div class="empty-title">No results loaded</div>
+      <div class="empty-sub">
+        Run IFert inside your Roblox executor.<br>
+        After the test completes, it will generate a link<br>
+        like <code>?r=YOUR_CODE</code> — open that URL to see results.<br><br>
+        Or paste a result JSON below to preview.
+      </div>
+      <div style="margin-top:28px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+        <textarea id="paste-box" placeholder='Paste JSON here... {"executor":"Synapse X","passes":120,...}'
+          style="width:100%;max-width:480px;height:90px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:11px;padding:10px 12px;resize:vertical;outline:none;"></textarea>
+      </div>
+      <button onclick="loadPasted()" style="margin-top:10px;font-family:var(--mono);font-size:11px;padding:9px 22px;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer;letter-spacing:0.05em;">
+        Load JSON
+      </button>
+      <div style="margin-top:28px;">
+        <button class="demo-tag" onclick="loadDemo()" style="cursor:pointer;border:none;font-family:var(--mono);">
+          <div class="pulse"></div>
+          Try demo results
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════
+//  DATA MODEL
+// ══════════════════════════════════════
+let currentFilter = 'all';
+let allRows = [];
+
+// ── Grade helper ──────────────────────
+function getGrade(pct) {
+  if (pct >= 95) return { letter: 'S', color: '#ffc14a', bg: 'rgba(255,193,74,0.15)' };
+  if (pct >= 85) return { letter: 'A', color: '#3ddc97', bg: 'rgba(61,220,151,0.12)' };
+  if (pct >= 70) return { letter: 'B', color: '#5b7cff', bg: 'rgba(91,124,255,0.15)' };
+  if (pct >= 55) return { letter: 'C', color: '#ff9f5f', bg: 'rgba(255,159,95,0.15)' };
+  if (pct >= 40) return { letter: 'D', color: '#ff6b6b', bg: 'rgba(255,107,107,0.15)' };
+  return { letter: 'F', color: '#ff5f5f', bg: 'rgba(255,95,95,0.18)' };
 }
 
--- Window dimensions (bigger)
-local WIN_W  = 780
-local WIN_H  = 580
-local LEFT_W = 230
-
--- ═══════════════════════════════════
---  CATEGORIES
--- ═══════════════════════════════════
-local Categories = {
-    {name="Cache",       id="cache"},
-    {name="Closures",    id="closures"},
-    {name="Console",     id="console"},
-    {name="Crypt",       id="crypt"},
-    {name="Debug",       id="debug"},
-    {name="Filesystem",  id="filesystem"},
-    {name="Input",       id="input"},
-    {name="Instances",   id="instances"},
-    {name="Metatable",   id="metatable"},
-    {name="Misc",        id="misc"},
-    {name="Scripts",     id="scripts"},
-    {name="Drawing",     id="drawing"},
-    {name="WebSocket",   id="websocket"},
-    {name="Environment", id="environment"},
-    {name="Table",       id="table_lib"},
-    {name="Coroutine",   id="coroutine_lib"},
-    {name="Actors",      id="actors"},
-    {name="Signal",      id="signal"},
-    {name="String",      id="string_lib"},
+// ── Ring color by grade ───────────────
+function ringColor(pct) {
+  if (pct >= 85) return '#3ddc97';
+  if (pct >= 70) return '#5b7cff';
+  if (pct >= 50) return '#ffc14a';
+  return '#ff5f5f';
 }
 
-local State = {
-    skipped   = {},
-    isRunning = false,
-    ddOpen    = false,
-    passes    = 0, fails = 0, notest = 0, aliasWarn = 0,
+// ══════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════
+function renderResults(data) {
+  document.getElementById('empty-view').style.display  = 'none';
+  document.getElementById('results-view').style.display = 'block';
+
+  const passes  = data.passes  || 0;
+  const fails   = data.fails   || 0;
+  const notest  = data.notest  || 0;
+  const aliases = data.aliasWarn || 0;
+  const total   = passes + fails + notest;
+  const tested  = passes + fails;
+  const pct     = tested > 0 ? Math.round(passes / tested * 100) : 0;
+
+  // Executor card
+  document.getElementById('exec-name').textContent     = data.executor || 'Unknown';
+  document.getElementById('exec-version').textContent  = data.version  || '—';
+  document.getElementById('exec-identity').textContent = data.identity != null ? 'Level ' + data.identity : '—';
+  document.getElementById('exec-total').textContent    = total + ' tests';
+  document.getElementById('exec-date').textContent     = data.date || new Date().toLocaleDateString();
+
+  // Grade badge
+  const grade = getGrade(pct);
+  const badge = document.getElementById('grade-badge');
+  badge.textContent = grade.letter;
+  badge.style.color = grade.color;
+  badge.style.background = grade.bg;
+
+  // Stats
+  document.getElementById('stat-pass').textContent   = passes;
+  document.getElementById('stat-fail').textContent   = fails;
+  document.getElementById('stat-notest').textContent = notest;
+  document.getElementById('stat-alias').textContent  = aliases;
+
+  // Ring — animate after a tick
+  setTimeout(() => {
+    const circ = 408;
+    const offset = circ - (circ * pct / 100);
+    const ring = document.getElementById('ring-fg');
+    ring.style.strokeDashoffset = offset;
+    ring.style.stroke = ringColor(pct);
+    animCount(document.getElementById('ring-pct'), 0, pct, 1400, v => v + '%');
+  }, 80);
+
+  // Progress bars
+  setTimeout(() => {
+    document.getElementById('prog-pass').style.width   = (passes / total * 100) + '%';
+    document.getElementById('prog-fail').style.width   = (fails  / total * 100) + '%';
+    document.getElementById('prog-notest').style.width = (notest / total * 100) + '%';
+  }, 80);
+
+  // Timestamp
+  document.getElementById('timestamp').textContent =
+    'Generated ' + new Date().toLocaleString();
+
+  // Build result rows
+  allRows = data.results || [];
+  renderList();
 }
 
--- ═══════════════════════════════════
---  HELPERS
--- ═══════════════════════════════════
-local function getGlobal(path)
-    local v = getfenv(0)
-    while v ~= nil and path ~= "" do
-        local n, nx = string.match(path, "^([^.]+)%.?(.*)$")
-        v = v[n]; path = nx
-    end
-    return v
-end
-
-local function mkCorner(p, r)
-    local c = Instance.new("UICorner", p)
-    c.CornerRadius = UDim.new(0, r or 8)
-end
-
-local function mkStroke(p, col, th)
-    local s = Instance.new("UIStroke", p)
-    s.Color = col or T.Border
-    s.Thickness = th or 1
-end
-
-local function makeDraggable(frame, handle)
-    handle = handle or frame
-    local drag, di, ds, sp
-    handle.InputBegan:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseButton1 then
-            drag = true; ds = i.Position; sp = frame.Position
-            i.Changed:Connect(function()
-                if i.UserInputState == Enum.UserInputState.End then drag = false end
-            end)
-        end
-    end)
-    handle.InputChanged:Connect(function(i)
-        if i.UserInputType == Enum.UserInputType.MouseMovement then di = i end
-    end)
-    UIS.InputChanged:Connect(function(i)
-        if i == di and drag then
-            local d = i.Position - ds
-            frame.Position = UDim2.new(sp.X.Scale, sp.X.Offset + d.X, sp.Y.Scale, sp.Y.Offset + d.Y)
-        end
-    end)
-end
-
--- ═══════════════════════════════════
---  SCREENGUI + MAIN  (ClipsDescendants = false so dropdown overflows)
--- ═══════════════════════════════════
-local SG = Instance.new("ScreenGui")
-SG.Name = "IFert_UNC"
-SG.ResetOnSpawn = false
-SG.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-SG.DisplayOrder = 999
-pcall(function() SG.Parent = CoreGui end)
-if not SG.Parent then SG.Parent = LP.PlayerGui end
-
-local Main = Instance.new("Frame")
-Main.Name = "Main"
-Main.Size = UDim2.new(0, WIN_W, 0, WIN_H)
-Main.Position = UDim2.new(0.5, -WIN_W/2, 0.5, -WIN_H/2)
-Main.BackgroundColor3 = T.BG
-Main.BackgroundTransparency = 0.08
-Main.BorderSizePixel = 0
-Main.ClipsDescendants = false   -- MUST be false for dropdown overflow
-Main.Parent = SG
-mkCorner(Main, 12)
-mkStroke(Main, Color3.fromRGB(202, 202, 215), 1)
-
--- Shadow
-local Shad = Instance.new("ImageLabel")
-Shad.AnchorPoint = Vector2.new(0.5, 0.5)
-Shad.BackgroundTransparency = 1
-Shad.Position = UDim2.new(0.5, 0, 0.5, 10)
-Shad.Size = UDim2.new(1, 50, 1, 50)
-Shad.ZIndex = 0
-Shad.Image = "rbxassetid://6014261993"
-Shad.ImageColor3 = Color3.fromRGB(130, 130, 155)
-Shad.ImageTransparency = 0.74
-Shad.ScaleType = Enum.ScaleType.Slice
-Shad.SliceCenter = Rect.new(49, 49, 450, 450)
-Shad.Parent = Main
-
--- Clip frame wraps everything EXCEPT the dropdown
-local Clip = Instance.new("Frame")
-Clip.Size = UDim2.new(1, 0, 1, 0)
-Clip.BackgroundTransparency = 1
-Clip.BorderSizePixel = 0
-Clip.ClipsDescendants = true
-Clip.ZIndex = 1
-Clip.Parent = Main
-
--- ── TITLE BAR ──────────────────────
-local TBar = Instance.new("Frame")
-TBar.Size = UDim2.new(1, 0, 0, 44)
-TBar.BackgroundColor3 = T.Surface
-TBar.BackgroundTransparency = 0.04
-TBar.BorderSizePixel = 0
-TBar.ZIndex = 5
-TBar.Parent = Clip
-
-local TBDiv = Instance.new("Frame")
-TBDiv.Size = UDim2.new(1, 0, 0, 1)
-TBDiv.Position = UDim2.new(0, 0, 1, -1)
-TBDiv.BackgroundColor3 = T.Border
-TBDiv.BorderSizePixel = 0
-TBDiv.ZIndex = 6
-TBDiv.Parent = TBar
-
--- Traffic lights
-local function mkDot(x, col)
-    local d = Instance.new("TextButton")
-    d.Size = UDim2.new(0, 13, 0, 13)
-    d.Position = UDim2.new(0, x, 0.5, -6)
-    d.BackgroundColor3 = col
-    d.Text = ""
-    d.BorderSizePixel = 0
-    d.ZIndex = 7
-    d.Parent = TBar
-    mkCorner(d, 99)
-    local orig = col
-    d.MouseEnter:Connect(function()
-        TweenService:Create(d, TweenInfo.new(0.1), {BackgroundColor3 = col:Lerp(Color3.new(0,0,0), 0.22)}):Play()
-    end)
-    d.MouseLeave:Connect(function()
-        TweenService:Create(d, TweenInfo.new(0.1), {BackgroundColor3 = orig}):Play()
-    end)
-    return d
-end
-
-local RedDot    = mkDot(14, Color3.fromRGB(255, 95,  87))
-local YellowDot = mkDot(32, Color3.fromRGB(255, 188, 46))
-local GreenDot  = mkDot(50, Color3.fromRGB(40,  201, 64))
-
-local function closeUI()
-    TweenService:Create(Main, TweenInfo.new(0.18, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
-        {BackgroundTransparency = 1, Size = UDim2.new(0, WIN_W, 0, 0)}):Play()
-    task.delay(0.2, function() SG:Destroy() end)
-end
-RedDot.MouseButton1Click:Connect(closeUI)
-YellowDot.MouseButton1Click:Connect(closeUI)
-GreenDot.MouseButton1Click:Connect(function()
-    TweenService:Create(GreenDot, TweenInfo.new(0.08), {Size = UDim2.new(0, 18, 0, 18)}):Play()
-    task.delay(0.1, function()
-        TweenService:Create(GreenDot, TweenInfo.new(0.1), {Size = UDim2.new(0, 13, 0, 13)}):Play()
-    end)
-end)
-
-local TitleL = Instance.new("TextLabel")
-TitleL.Size = UDim2.new(0, 120, 1, 0)
-TitleL.Position = UDim2.new(0, 74, 0, 0)
-TitleL.BackgroundTransparency = 1
-TitleL.Text = "IFert"
-TitleL.Font = Enum.Font.GothamBold
-TitleL.TextSize = 15
-TitleL.TextColor3 = T.Text
-TitleL.TextXAlignment = Enum.TextXAlignment.Left
-TitleL.ZIndex = 6
-TitleL.Parent = TBar
-
-local VerL = Instance.new("TextLabel")
-VerL.Size = UDim2.new(0, 50, 1, 0)
-VerL.Position = UDim2.new(0, 113, 0, 0)
-VerL.BackgroundTransparency = 1
-VerL.Text = "v3.1"
-VerL.Font = Enum.Font.Gotham
-VerL.TextSize = 10
-VerL.TextColor3 = T.TextMuted
-VerL.TextXAlignment = Enum.TextXAlignment.Left
-VerL.ZIndex = 6
-VerL.Parent = TBar
-
-makeDraggable(Main, TBar)
-
--- ── CONTENT ────────────────────────
-local Cont = Instance.new("Frame")
-Cont.Size = UDim2.new(1, 0, 1, -44)
-Cont.Position = UDim2.new(0, 0, 0, 44)
-Cont.BackgroundTransparency = 1
-Cont.ZIndex = 2
-Cont.Parent = Clip
-
--- LEFT PANEL
-local Left = Instance.new("Frame")
-Left.Size = UDim2.new(0, LEFT_W, 1, 0)
-Left.BackgroundColor3 = T.Surface
-Left.BackgroundTransparency = 0.04
-Left.BorderSizePixel = 0
-Left.ZIndex = 3
-Left.Parent = Cont
-
-local LBord = Instance.new("Frame")
-LBord.Size = UDim2.new(0, 1, 1, 0)
-LBord.Position = UDim2.new(1, -1, 0, 0)
-LBord.BackgroundColor3 = T.Border
-LBord.BorderSizePixel = 0
-LBord.ZIndex = 4
-LBord.Parent = Left
-
--- RIGHT PANEL
-local Right = Instance.new("Frame")
-Right.Size = UDim2.new(1, -(LEFT_W + 1), 1, 0)
-Right.Position = UDim2.new(0, LEFT_W + 1, 0, 0)
-Right.BackgroundColor3 = T.Console
-Right.BackgroundTransparency = 0
-Right.BorderSizePixel = 0
-Right.ZIndex = 3
-Right.Parent = Cont
-
--- ═══════════════════════════════════
---  LEFT PANEL CONTENT
--- ═══════════════════════════════════
-local LIn = Instance.new("Frame")
-LIn.Size = UDim2.new(1, 0, 1, 0)
-LIn.BackgroundTransparency = 1
-LIn.ZIndex = 4
-LIn.Parent = Left
-
-local LPad = Instance.new("UIPadding", LIn)
-LPad.PaddingLeft  = UDim.new(0, 12)
-LPad.PaddingRight = UDim.new(0, 12)
-LPad.PaddingTop   = UDim.new(0, 14)
-
--- "SKIP CATEGORIES" label
-local SkipL = Instance.new("TextLabel")
-SkipL.Size = UDim2.new(1, 0, 0, 16)
-SkipL.BackgroundTransparency = 1
-SkipL.Text = "SKIP CATEGORIES"
-SkipL.Font = Enum.Font.GothamBold
-SkipL.TextSize = 9
-SkipL.TextColor3 = T.TextMuted
-SkipL.TextXAlignment = Enum.TextXAlignment.Left
-SkipL.ZIndex = 5
-SkipL.Parent = LIn
-
--- DROPDOWN BUTTON
-local DDBtn = Instance.new("TextButton")
-DDBtn.Size = UDim2.new(1, 0, 0, 32)
-DDBtn.Position = UDim2.new(0, 0, 0, 22)
-DDBtn.BackgroundColor3 = T.SurfaceHigh
-DDBtn.BackgroundTransparency = 0
-DDBtn.Text = ""
-DDBtn.BorderSizePixel = 0
-DDBtn.ZIndex = 10
-DDBtn.Parent = LIn
-mkCorner(DDBtn, 7)
-mkStroke(DDBtn, T.Border)
-
-local DDLbl = Instance.new("TextLabel")
-DDLbl.Size = UDim2.new(1, -26, 1, 0)
-DDLbl.Position = UDim2.new(0, 10, 0, 0)
-DDLbl.BackgroundTransparency = 1
-DDLbl.Text = "Choose to skip..."
-DDLbl.Font = Enum.Font.Gotham
-DDLbl.TextSize = 11
-DDLbl.TextColor3 = T.TextMuted
-DDLbl.TextXAlignment = Enum.TextXAlignment.Left
-DDLbl.ZIndex = 11
-DDLbl.Parent = DDBtn
-
-local DDArrow = Instance.new("TextLabel")
-DDArrow.Size = UDim2.new(0, 20, 1, 0)
-DDArrow.Position = UDim2.new(1, -22, 0, 0)
-DDArrow.BackgroundTransparency = 1
-DDArrow.Text = "▾"
-DDArrow.Font = Enum.Font.GothamBold
-DDArrow.TextSize = 13
-DDArrow.TextColor3 = T.TextDim
-DDArrow.ZIndex = 11
-DDArrow.Parent = DDBtn
-
--- DROPDOWN LIST — parented to Main (NOT Clip) so it overflows the clipped area
-local DD_IH  = 27
-local DD_MAX = DD_IH * 9 + 8
--- Position: titlebar(44) + pad(14) + skipLabel(16) + DDBtn(32) + 2gap = 108
-local DDList = Instance.new("Frame")
-DDList.Name = "DDList"
-DDList.Size = UDim2.new(0, LEFT_W - 24, 0, 0)
-DDList.Position = UDim2.new(0, 12, 0, 108)
-DDList.BackgroundColor3 = T.Surface
-DDList.BackgroundTransparency = 0
-DDList.BorderSizePixel = 0
-DDList.ClipsDescendants = true
-DDList.ZIndex = 60
-DDList.Visible = false
-DDList.Parent = Main    -- parent = Main, not Clip!
-mkCorner(DDList, 7)
-mkStroke(DDList, T.Border)
-
-local DDScroll = Instance.new("ScrollingFrame")
-DDScroll.Size = UDim2.new(1, 0, 1, 0)
-DDScroll.BackgroundTransparency = 1
-DDScroll.BorderSizePixel = 0
-DDScroll.ScrollBarThickness = 3
-DDScroll.ScrollBarImageColor3 = T.Accent
-DDScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-DDScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-DDScroll.ZIndex = 61
-DDScroll.Parent = DDList
-
-Instance.new("UIListLayout", DDScroll).Padding = UDim.new(0, 1)
-local DDPad = Instance.new("UIPadding", DDScroll)
-DDPad.PaddingTop    = UDim.new(0, 4)
-DDPad.PaddingBottom = UDim.new(0, 4)
-DDPad.PaddingLeft   = UDim.new(0, 4)
-DDPad.PaddingRight  = UDim.new(0, 4)
-
-local function updateDDLabel()
-    local ex = {}
-    for _, cat in ipairs(Categories) do
-        if State.skipped[cat.id] then table.insert(ex, cat.name) end
-    end
-    if #ex == 0 then
-        DDLbl.Text = "Choose to skip..."
-        DDLbl.TextColor3 = T.TextMuted
-    elseif #ex <= 2 then
-        DDLbl.Text = table.concat(ex, ", ")
-        DDLbl.TextColor3 = T.Fail
-    else
-        DDLbl.Text = #ex .. " categories skipped"
-        DDLbl.TextColor3 = T.Fail
-    end
-end
-
--- Build dropdown rows
-for i, cat in ipairs(Categories) do
-    local row = Instance.new("TextButton")
-    row.Size = UDim2.new(1, 0, 0, DD_IH)
-    row.BackgroundColor3 = T.SurfaceHigh
-    row.BackgroundTransparency = 1
-    row.Text = ""
-    row.BorderSizePixel = 0
-    row.LayoutOrder = i
-    row.ZIndex = 62
-    row.Parent = DDScroll
-    mkCorner(row, 5)
-
-    local chkBg = Instance.new("Frame")
-    chkBg.Size = UDim2.new(0, 14, 0, 14)
-    chkBg.Position = UDim2.new(0, 6, 0.5, -7)
-    chkBg.BackgroundColor3 = T.Surface
-    chkBg.BorderSizePixel = 0
-    chkBg.ZIndex = 63
-    chkBg.Parent = row
-    mkCorner(chkBg, 4)
-    mkStroke(chkBg, T.Border)
-
-    local chkX = Instance.new("TextLabel")
-    chkX.Size = UDim2.new(1, 0, 1, 0)
-    chkX.BackgroundTransparency = 1
-    chkX.Text = ""
-    chkX.Font = Enum.Font.GothamBold
-    chkX.TextSize = 10
-    chkX.TextColor3 = T.Fail
-    chkX.ZIndex = 64
-    chkX.Parent = chkBg
-
-    local lbl = Instance.new("TextLabel")
-    lbl.Size = UDim2.new(1, -28, 1, 0)
-    lbl.Position = UDim2.new(0, 26, 0, 0)
-    lbl.BackgroundTransparency = 1
-    lbl.Text = cat.name
-    lbl.Font = Enum.Font.Gotham
-    lbl.TextSize = 12
-    lbl.TextColor3 = T.Text
-    lbl.TextXAlignment = Enum.TextXAlignment.Left
-    lbl.ZIndex = 63
-    lbl.Parent = row
-
-    row.MouseEnter:Connect(function()
-        TweenService:Create(row, TweenInfo.new(0.1), {BackgroundTransparency = 0}):Play()
-    end)
-    row.MouseLeave:Connect(function()
-        TweenService:Create(row, TweenInfo.new(0.1), {BackgroundTransparency = 1}):Play()
-    end)
-    row.MouseButton1Click:Connect(function()
-        State.skipped[cat.id] = not State.skipped[cat.id]
-        local sk = State.skipped[cat.id]
-        chkX.Text = sk and "x" or ""
-        chkBg.BackgroundColor3 = sk and Color3.fromRGB(255, 228, 228) or T.Surface
-        lbl.TextColor3 = sk and T.Fail or T.Text
-        updateDDLabel()
-    end)
-end
-
-local ddAnim = false
-local function setDD(open)
-    if ddAnim then return end
-    ddAnim = true
-    State.ddOpen = open
-    DDList.Visible = true
-    local h = open and math.min(DD_MAX, #Categories * DD_IH + 8) or 0
-    TweenService:Create(DDList, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {Size = UDim2.new(0, LEFT_W - 24, 0, h)}):Play()
-    TweenService:Create(DDArrow, TweenInfo.new(0.18), {Rotation = open and 180 or 0}):Play()
-    task.delay(0.2, function()
-        if not open then DDList.Visible = false end
-        ddAnim = false
-    end)
-end
-
-DDBtn.MouseButton1Click:Connect(function() setDD(not State.ddOpen) end)
-
-UIS.InputBegan:Connect(function(inp)
-    if inp.UserInputType == Enum.UserInputType.MouseButton1 and State.ddOpen then
-        task.defer(function()
-            local mp = UIS:GetMouseLocation()
-            local function inB(f)
-                local p, s = f.AbsolutePosition, f.AbsoluteSize
-                return mp.X >= p.X and mp.X <= p.X + s.X and mp.Y >= p.Y and mp.Y <= p.Y + s.Y
-            end
-            if not inB(DDList) and not inB(DDBtn) then setDD(false) end
-        end)
-    end
-end)
-
--- ── DIVIDER + OPTIONS ──────────────
-local LSep = Instance.new("Frame")
-LSep.Size = UDim2.new(1, 0, 0, 1)
-LSep.Position = UDim2.new(0, 0, 0, 330)
-LSep.BackgroundColor3 = T.Border
-LSep.BorderSizePixel = 0
-LSep.ZIndex = 4
-LSep.Parent = LIn
-
-local OptL = Instance.new("TextLabel")
-OptL.Size = UDim2.new(1, 0, 0, 16)
-OptL.Position = UDim2.new(0, 0, 0, 340)
-OptL.BackgroundTransparency = 1
-OptL.Text = "OPTIONS"
-OptL.Font = Enum.Font.GothamBold
-OptL.TextSize = 9
-OptL.TextColor3 = T.TextMuted
-OptL.TextXAlignment = Enum.TextXAlignment.Left
-OptL.ZIndex = 5
-OptL.Parent = LIn
-
-local DelRow = Instance.new("Frame")
-DelRow.Size = UDim2.new(1, 0, 0, 30)
-DelRow.Position = UDim2.new(0, 0, 0, 362)
-DelRow.BackgroundTransparency = 1
-DelRow.ZIndex = 5
-DelRow.Parent = LIn
-
-local DelL = Instance.new("TextLabel")
-DelL.Size = UDim2.new(1, -55, 1, 0)
-DelL.BackgroundTransparency = 1
-DelL.Text = "Test Delay"
-DelL.Font = Enum.Font.Gotham
-DelL.TextSize = 12
-DelL.TextColor3 = T.Text
-DelL.TextXAlignment = Enum.TextXAlignment.Left
-DelL.ZIndex = 6
-DelL.Parent = DelRow
-
-local DelBox = Instance.new("TextBox")
-DelBox.Size = UDim2.new(0, 50, 0, 24)
-DelBox.Position = UDim2.new(1, -50, 0.5, -12)
-DelBox.BackgroundColor3 = T.SurfaceHigh
-DelBox.Text = "0.05"
-DelBox.Font = Enum.Font.Code
-DelBox.TextSize = 11
-DelBox.TextColor3 = T.Text
-DelBox.BorderSizePixel = 0
-DelBox.ZIndex = 6
-DelBox.Parent = DelRow
-mkCorner(DelBox, 5)
-mkStroke(DelBox, T.Border)
-local dbp = Instance.new("UIPadding", DelBox)
-dbp.PaddingLeft = UDim.new(0, 6)
-
--- RUN BUTTON
-local RunBtn = Instance.new("TextButton")
-RunBtn.Size = UDim2.new(1, 0, 0, 36)
-RunBtn.Position = UDim2.new(0, 0, 1, -50)
-RunBtn.BackgroundColor3 = T.Accent
-RunBtn.Text = "  Run Test"
-RunBtn.Font = Enum.Font.GothamBold
-RunBtn.TextSize = 13
-RunBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-RunBtn.BorderSizePixel = 0
-RunBtn.ZIndex = 5
-RunBtn.Parent = LIn
-mkCorner(RunBtn, 8)
-
-RunBtn.MouseEnter:Connect(function()
-    if not State.isRunning then
-        TweenService:Create(RunBtn, TweenInfo.new(0.12), {BackgroundColor3 = T.AccentHov}):Play()
-    end
-end)
-RunBtn.MouseLeave:Connect(function()
-    if not State.isRunning then
-        TweenService:Create(RunBtn, TweenInfo.new(0.12), {BackgroundColor3 = T.Accent}):Play()
-    end
-end)
-
--- ═══════════════════════════════════
---  CONSOLE
--- ═══════════════════════════════════
-local ConScroll = Instance.new("ScrollingFrame")
-ConScroll.Size = UDim2.new(1, 0, 1, 0)
-ConScroll.BackgroundTransparency = 1
-ConScroll.BorderSizePixel = 0
-ConScroll.ScrollBarThickness = 4
-ConScroll.ScrollBarImageColor3 = T.Accent
-ConScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-ConScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-ConScroll.ZIndex = 4
-ConScroll.Parent = Right
-
-Instance.new("UIListLayout", ConScroll).SortOrder = Enum.SortOrder.LayoutOrder
-local CP = Instance.new("UIPadding", ConScroll)
-CP.PaddingLeft   = UDim.new(0, 10)
-CP.PaddingRight  = UDim.new(0, 10)
-CP.PaddingTop    = UDim.new(0, 8)
-CP.PaddingBottom = UDim.new(0, 8)
-
-local lineN = 0
-local function clog(text, color)
-    lineN = lineN + 1
-    local row = Instance.new("Frame")
-    row.Name = "L" .. lineN
-    row.Size = UDim2.new(1, 0, 0, 17)
-    row.BackgroundTransparency = 1
-    row.LayoutOrder = lineN
-    row.ZIndex = 5
-    row.Parent = ConScroll
-    local lb = Instance.new("TextLabel")
-    lb.Size = UDim2.new(1, 0, 1, 0)
-    lb.BackgroundTransparency = 1
-    lb.Text = text
-    lb.Font = Enum.Font.Code
-    lb.TextSize = 11
-    lb.TextColor3 = color or T.Text
-    lb.TextXAlignment = Enum.TextXAlignment.Left
-    lb.TextTruncate = Enum.TextTruncate.AtEnd
-    lb.ZIndex = 6
-    lb.Parent = row
-    task.defer(function()
-        ConScroll.CanvasPosition = Vector2.new(0, math.max(0, ConScroll.AbsoluteCanvasSize.Y - ConScroll.AbsoluteSize.Y + 8))
-    end)
-end
-
-local function csep()
-    lineN = lineN + 1
-    local s = Instance.new("Frame")
-    s.Name = "L" .. lineN
-    s.Size = UDim2.new(1, 0, 0, 1)
-    s.BackgroundColor3 = T.Border
-    s.BorderSizePixel = 0
-    s.LayoutOrder = lineN
-    s.ZIndex = 5
-    s.Parent = ConScroll
-end
-
-local function clearCon()
-    for _, c in ipairs(ConScroll:GetChildren()) do
-        if c:IsA("Frame") then c:Destroy() end
-    end
-    lineN = 0
-    State.passes = 0; State.fails = 0; State.notest = 0; State.aliasWarn = 0
-end
-
--- ═══════════════════════════════════
---  TEST REGISTRY
--- ═══════════════════════════════════
-local AllTests = {}
-local function def(cat, name, aliases, cb)
-    table.insert(AllTests, {category = cat, name = name, aliases = aliases or {}, callback = cb})
-end
-
--- ═══════════════════════════════════
---  CACHE  (5)
--- ═══════════════════════════════════
-def("cache","cache.invalidate",{},function()
-    local folder = Instance.new("Folder")
-    local part   = Instance.new("Part", folder)
-    local before = folder:FindFirstChild("Part")
-    assert(before == part, "Sanity: before should equal part")
-    cache.invalidate(before)
-    local after = folder:FindFirstChild("Part")
-    assert(after ~= before, "cache.invalidate did not produce new reference — fake detected")
-    assert(after.Name == part.Name, "Name mismatch after invalidation")
-end)
-
-def("cache","cache.iscached",{},function()
-    local p = Instance.new("Part")
-    assert(cache.iscached(p) == true, "New Part should be cached")
-    cache.invalidate(p)
-    assert(cache.iscached(p) == false, "Invalidated ref must not be cached")
-    assert(type(cache.iscached(Instance.new("Part"))) == "boolean", "Must return boolean")
-end)
-
-def("cache","cache.replace",{},function()
-    local part = Instance.new("Part")
-    local fire = Instance.new("Fire")
-    cache.replace(part, fire)
-    assert(cache.iscached(part) == false, "Part slot should be vacated")
-    assert(cache.iscached(fire) == true,  "Fire should occupy Part slot")
-end)
-
-def("cache","cloneref",{},function()
-    local p  = Instance.new("Part")
-    local cl = cloneref(p)
-    assert(p ~= cl, "cloneref must return different userdata")
-    cl.Name = "IFertClone"
-    assert(p.Name == "IFertClone", "Mutation via clone must reflect on original")
-    p.Name = "IFertOrig"
-    assert(cl.Name == "IFertOrig", "Mutation via original must reflect on clone")
-end)
-
-def("cache","compareinstances",{},function()
-    local p  = Instance.new("Part")
-    local cl = cloneref(p)
-    assert(compareinstances(p, cl) == true,  "cloneref pair must be equal")
-    local other = Instance.new("Part")
-    assert(compareinstances(p, other) == false, "Different instances must not be equal — always-true fake")
-end)
-
--- ═══════════════════════════════════
---  CLOSURES  (10)
--- ═══════════════════════════════════
-def("closures","checkcaller",{},function()
-    assert(checkcaller() == true, "Must be true in executor scope")
-    local res = nil
-    coroutine.wrap(function() res = checkcaller() end)()
-    assert(type(res) == "boolean", "Must return boolean in coroutine")
-end)
-
-def("closures","clonefunction",{},function()
-    local uv = {"real"}
-    local function orig() return uv[1] end
-    local clone = clonefunction(orig)
-    assert(orig ~= clone, "Must return new function ref")
-    assert(orig() == clone(), "Must return same value")
-    hookfunction(clone, function() return "hooked" end)
-    assert(orig() == "real", "Hooking clone must NOT affect original")
-end)
-
-def("closures","getcallingscript",{})
-
-def("closures","getscriptclosure",{"getscriptfunction"},function()
-    local m    = game:GetService("CoreGui").RobloxGui.Modules.Common.Constants
-    local real = getrenv().require(m)
-    local gen  = getscriptclosure(m)()
-    assert(real ~= gen, "Must return new table, not same reference")
-    local rk, gk = 0, 0
-    for _ in pairs(real) do rk = rk + 1 end
-    for _ in pairs(gen)  do gk = gk + 1 end
-    assert(rk > 0,     "Constants table is empty")
-    assert(rk == gk,   "Key count mismatch real=" .. rk .. " gen=" .. gk)
-end)
-
-def("closures","hookfunction",{"replaceclosure"},function()
-    local calls = 0
-    local function orig() calls = calls + 1; return "orig" end
-    local ref = hookfunction(orig, function() calls = calls + 1; return "hook" end)
-    assert(orig() == "hook",   "Calling original must invoke hook")
-    assert(ref()  == "orig",   "ref() must invoke original")
-    assert(calls  == 2,        "Each called exactly once")
-    assert(orig ~= ref,        "Ref must differ from hooked fn")
-end)
-
-def("closures","iscclosure",{},function()
-    assert(iscclosure(print)         == true,  "print is C closure")
-    assert(iscclosure(math.sin)      == true,  "math.sin is C closure")
-    assert(iscclosure(function()end) == false, "Lua fn is NOT C closure")
-    assert(iscclosure(function()end) ~= iscclosure(print), "always-same fake check")
-end)
-
-def("closures","islclosure",{},function()
-    assert(islclosure(print)         == false, "print is NOT Lua closure")
-    assert(islclosure(math.abs)      == false, "math.abs is NOT Lua closure")
-    assert(islclosure(function()end) == true,  "Lua fn IS Lua closure")
-end)
-
-def("closures","isexecutorclosure",{"checkclosure","isourclosure"},function()
-    assert(isexecutorclosure(isexecutorclosure)          == true,  "Executor global -> true")
-    assert(isexecutorclosure(newcclosure(function()end)) == true,  "Executor C closure -> true")
-    assert(isexecutorclosure(function()end)              == true,  "Executor Lua closure -> true")
-    assert(isexecutorclosure(print)                      == false, "Roblox global -> false")
-    assert(isexecutorclosure(math.sin)                   == false, "Roblox C fn -> false — always-true fake check")
-end)
-
-def("closures","loadstring",{},function()
-    assert(assert(loadstring("return 2+2"))() == 4, "Basic eval failed")
-    assert(assert(loadstring("return ...")   )("hi") == "hi", "Vararg failed")
-    local f, e = loadstring("@@bad")
-    assert(f == nil,             "Must return nil for bad syntax")
-    assert(type(e) == "string",  "Must return error string")
-    if LP.Character and LP.Character:FindFirstChild("Animate") then
-        local bc = getscriptbytecode(LP.Character.Animate)
-        local bf, _ = loadstring(bc)
-        assert(type(bf) ~= "function", "Must NOT load raw Luau bytecode")
-    end
-end)
-
-def("closures","newcclosure",{},function()
-    local function lua() return "result" end
-    local cc = newcclosure(lua)
-    assert(lua ~= cc,              "Must be new function")
-    assert(iscclosure(cc) == true, "Result must be C closure")
-    assert(islclosure(cc) == false,"Result must NOT be Lua closure")
-    assert(cc() == "result",       "Must return same value")
-end)
-
--- ═══════════════════════════════════
---  CONSOLE  (6 existence)
--- ═══════════════════════════════════
-def("console","rconsoleclear",   {"consoleclear"})
-def("console","rconsolecreate",  {"consolecreate"})
-def("console","rconsoledestroy", {"consoledestroy"})
-def("console","rconsoleinput",   {"consoleinput"})
-def("console","rconsoleprint",   {"consoleprint"})
-def("console","rconsolesettitle",{"rconsolename","consolesettitle"})
-
--- ═══════════════════════════════════
---  CRYPT  (9)
--- ═══════════════════════════════════
-def("crypt","crypt.base64encode",{"crypt.base64.encode","crypt.base64_encode","base64.encode","base64_encode"},function()
-    assert(crypt.base64encode("test")  == "dGVzdA==", "Vector 'test' failed")
-    assert(crypt.base64encode("IFert") == "SUZlcnQ=", "Vector 'IFert' failed")
-    assert(crypt.base64encode("abc")   == "YWJj",     "Vector 'abc' failed")
-    assert(crypt.base64encode("A") ~= crypt.base64encode("B"), "Same output for different inputs — fake")
-end)
-
-def("crypt","crypt.base64decode",{"crypt.base64.decode","crypt.base64_decode","base64.decode","base64_decode"},function()
-    assert(crypt.base64decode("dGVzdA==") == "test",  "Decode 'test' failed")
-    assert(crypt.base64decode("SUZlcnQ=") == "IFert", "Decode 'IFert' failed")
-    assert(crypt.base64decode("YWJj")     == "abc",   "Decode 'abc' failed")
-    local orig = "IFert round-trip 12345!!"
-    assert(crypt.base64decode(crypt.base64encode(orig)) == orig, "Round-trip failed")
-end)
-
-def("crypt","crypt.encrypt",{},function()
-    local k = crypt.generatekey(); local msg = "IFert secret"
-    local enc, iv = crypt.encrypt(msg, k, nil, "CBC")
-    assert(iv,                "No IV returned")
-    assert(enc ~= msg,        "Ciphertext equals plaintext")
-    local k2 = crypt.generatekey()
-    local enc2, _ = crypt.encrypt(msg, k2, nil, "CBC")
-    assert(enc ~= enc2,       "Different keys must differ")
-    assert(crypt.decrypt(enc, k, iv, "CBC") == msg, "Decryption failed")
-end)
-
-def("crypt","crypt.decrypt",{},function()
-    local k = crypt.generatekey(); local iv = crypt.generatekey()
-    local msg = "IFert decrypt"
-    assert(crypt.decrypt(crypt.encrypt(msg, k, iv, "CBC"), k, iv, "CBC") == msg, "Decrypt failed")
-end)
-
-def("crypt","crypt.generatebytes",{},function()
-    local s = math.random(10, 50)
-    assert(#crypt.base64decode(crypt.generatebytes(s)) == s, "Decoded length wrong")
-    assert(crypt.generatebytes(32) ~= crypt.generatebytes(32), "Same bytes twice — not random, fake")
-end)
-
-def("crypt","crypt.generatekey",{},function()
-    local k1, k2 = crypt.generatekey(), crypt.generatekey()
-    assert(#crypt.base64decode(k1) == 32, "Key must decode to 32 bytes")
-    assert(k1 ~= k2,                      "Same key twice — not random, fake")
-end)
-
-def("crypt","crypt.hash",{},function()
-    assert(crypt.hash("test","sha256") == "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08","SHA-256 wrong")
-    assert(crypt.hash("test","md5")    == "098f6bcd4621d373cade4e832627b4f6","MD5 wrong")
-    assert(crypt.hash("","sha256") ~= crypt.hash("a","sha256"), "Hash collision — fake")
-    for _, a in ipairs({"sha1","sha384","sha512","sha3-224","sha3-256","sha3-512"}) do
-        assert(type(crypt.hash("x",a))=="string","Failed for "..a)
-    end
-end)
-
-def("crypt","crypt.hmac",{},function()
-    local ok, res = pcall(function() return crypt.hmac("test","key","sha256") end)
-    if not ok then return "crypt.hmac not supported" end
-    assert(type(res)=="string" and #res>0,"Must return non-empty string")
-    assert(crypt.hmac("test","key","sha256") ~= crypt.hmac("test","key2","sha256"),"Different keys must differ")
-end)
-
-def("crypt","crypt.random",{},function()
-    local ok, res = pcall(function() return crypt.random(16) end)
-    if not ok then return "crypt.random not supported" end
-    assert(type(res)=="string","Must return string")
-    assert(crypt.random(16) ~= crypt.random(16),"Same result twice — fake")
-end)
-
--- ═══════════════════════════════════
---  DEBUG  (11)
--- ═══════════════════════════════════
-def("debug","debug.getconstant",{},function()
-    local function t() print("Hello, world!") end
-    assert(debug.getconstant(t,1) == "print",         "Constant 1 must be 'print'")
-    assert(debug.getconstant(t,3) == "Hello, world!", "Constant 3 must be string literal")
-    assert(debug.getconstant(t,999) == nil,            "Out-of-range must return nil")
-end)
-
-def("debug","debug.getconstants",{},function()
-    local function t() local n = 5000 .. 50000; print("Hello, world!", n, warn) end
-    local c = debug.getconstants(t)
-    assert(type(c)=="table" and #c >= 4, "Must return table with >=4 constants, got " .. tostring(#c))
-    assert(c[1] == 50000,            "c[1] must be 50000")
-    assert(c[2] == "print",         "c[2] must be 'print'")
-    assert(c[4] == "Hello, world!","c[4] must be string literal")
-end)
-
-def("debug","debug.getinfo",{},function()
-    local function t(a, b) return a + b end
-    local info = debug.getinfo(t)
-    assert(type(info) == "table",          "Must return table")
-    assert(info.func  == t,                "func must equal queried function")
-    assert(type(info.source) == "string",  "source must be string")
-    assert(info.numparams == 2,            "numparams must be 2, got " .. tostring(info.numparams))
-end)
-
-def("debug","debug.getproto",{},function()
-    local function outer()
-        local function inner() return "proto_ok" end
-    end
-    local protos = debug.getproto(outer, 1, true)
-    assert(type(protos) == "table",    "Must return table")
-    local p = protos[1]
-    assert(p ~= nil,                   "Proto 1 must exist")
-    assert(p() == "proto_ok",          "Proto must return correct value")
-end)
-
-def("debug","debug.getprotos",{},function()
-    local function outer()
-        local function p1() return 1 end
-        local function p2() return 2 end
-        local function p3() return 3 end
-    end
-    local ps = debug.getprotos(outer)
-    assert(type(ps) == "table", "Must return table")
-    assert(#ps == 3,            "outer has 3 inner functions, got " .. tostring(#ps))
-end)
-
-def("debug","debug.getstack",{},function()
-    local marker = "IFert_stk_" .. tostring(math.random(10000,99999))
-    local _ = marker
-    assert(debug.getstack(1,1) == marker, "getstack(1,1) must be marker, got: " .. tostring(debug.getstack(1,1)))
-    local tbl = debug.getstack(1)
-    assert(type(tbl) == "table" and tbl[1] == marker, "getstack() table form failed")
-end)
-
-def("debug","debug.getupvalue",{},function()
-    local secret = "upval_" .. tostring(math.random(10000,99999))
-    local function t() return secret end
-    assert(debug.getupvalue(t,1) == secret, "Must return actual upvalue")
-end)
-
-def("debug","debug.getupvalues",{},function()
-    local uv1 = "first"; local uv2 = 12345
-    local function t() return uv1, uv2 end
-    local uvs = debug.getupvalues(t)
-    local f1, f2 = false, false
-    for _, v in pairs(uvs) do
-        if v == uv1 then f1 = true end
-        if v == uv2 then f2 = true end
-    end
-    assert(f1, "First upvalue not found"); assert(f2, "Second upvalue not found")
-end)
-
-def("debug","debug.setconstant",{},function()
-    local function t() return "original" end
-    debug.setconstant(t, 1, "mutated")
-    assert(t() == "mutated", "setconstant did not mutate")
-end)
-
-def("debug","debug.setstack",{},function()
-    local function t()
-        local x = "wrong"
-        debug.setstack(1, 1, "correct")
-        return x
-    end
-    assert(t() == "correct", "setstack did not modify slot")
-end)
-
-def("debug","debug.setupvalue",{},function()
-    local function uv() return "before" end
-    local function t() return uv() end
-    debug.setupvalue(t, 1, function() return "after" end)
-    assert(t() == "after", "setupvalue did not replace upvalue")
-end)
-
--- ═══════════════════════════════════
---  FILESYSTEM  (12)
--- ═══════════════════════════════════
-def("filesystem","readfile",{},function()
-    local u = "IFert_" .. tostring(math.random(100000,999999))
-    writefile(".ifert/rf.txt", u)
-    assert(readfile(".ifert/rf.txt") == u, "readfile returned wrong content")
-end)
-
-def("filesystem","writefile",{},function()
-    local u = "IFert_write_" .. tostring(math.random(100000,999999))
-    writefile(".ifert/wf.txt", u)
-    assert(readfile(".ifert/wf.txt") == u, "Write failed")
-    writefile(".ifert/wf.txt", "overwritten")
-    assert(readfile(".ifert/wf.txt") == "overwritten", "Overwrite failed")
-end)
-
-def("filesystem","appendfile",{},function()
-    writefile(".ifert/af.txt","Hello")
-    appendfile(".ifert/af.txt",", World!")
-    assert(readfile(".ifert/af.txt") == "Hello, World!", "Append produced wrong result")
-end)
-
-def("filesystem","makefolder",{},function()
-    local path = ".ifert/mkf_" .. tostring(math.random(1000,9999))
-    assert(not isfolder(path), "Folder should not exist yet")
-    makefolder(path)
-    assert(isfolder(path), "makefolder did not create folder")
-    pcall(function() delfolder(path) end)
-end)
-
-def("filesystem","listfiles",{},function()
-    pcall(function() delfolder(".ifert/lf_t") end)
-    makefolder(".ifert/lf_t")
-    writefile(".ifert/lf_t/a.txt","a")
-    writefile(".ifert/lf_t/b.txt","b")
-    writefile(".ifert/lf_t/c.txt","c")
-    local files = listfiles(".ifert/lf_t")
-    assert(type(files) == "table", "Must return table")
-    assert(#files == 3, "Expected 3 files, got " .. tostring(#files))
-end)
-
-def("filesystem","isfile",{},function()
-    writefile(".ifert/isf.txt","x")
-    assert(isfile(".ifert/isf.txt") == true,  "Must return true for file")
-    assert(isfile(".ifert")         == false, "Must return false for folder")
-    assert(isfile(".ifert/noexist_abc.txt") == false, "Must return false for nonexistent")
-end)
-
-def("filesystem","isfolder",{},function()
-    assert(isfolder(".ifert")         == true,  "Must return true for folder")
-    assert(isfolder(".ifert/isf.txt") == false, "Must return false for file")
-    assert(isfolder(".ifert/nope_xyz")== false, "Must return false for nonexistent")
-end)
-
-def("filesystem","delfolder",{},function()
-    local path = ".ifert/dfold_" .. tostring(math.random(1000,9999))
-    makefolder(path)
-    delfolder(path)
-    assert(not isfolder(path), "delfolder did not remove folder")
-end)
-
-def("filesystem","delfile",{},function()
-    local path = ".ifert/dfile_" .. tostring(math.random(1000,9999)) .. ".txt"
-    writefile(path, "bye")
-    delfile(path)
-    assert(not isfile(path), "delfile did not remove file")
-end)
-
-def("filesystem","loadfile",{},function()
-    writefile(".ifert/lf.lua","return ...")
-    local fn, _ = loadfile(".ifert/lf.lua")
-    assert(type(fn) == "function", "Should return function for valid Lua")
-    assert(fn("IFert") == "IFert", "Vararg passing failed")
-    writefile(".ifert/lf_bad.lua","@@@@bad@@@@")
-    local fn2, err2 = loadfile(".ifert/lf_bad.lua")
-    assert(fn2 == nil,             "Should return nil for syntax error")
-    assert(type(err2) == "string", "Should return error string")
-end)
-
-def("filesystem","dofile",{})
-
-def("filesystem","getcustomasset",{},function()
-    writefile(".ifert/ca1.txt","asset1"); writefile(".ifert/ca2.txt","asset2")
-    local id1 = getcustomasset(".ifert/ca1.txt")
-    local id2 = getcustomasset(".ifert/ca2.txt")
-    assert(type(id1)=="string" and id1:match("rbxasset://"), "Must return rbxasset URL")
-    assert(id1 ~= id2, "Different files must give different IDs — fake detected")
-end)
-
--- ═══════════════════════════════════
---  INPUT  (10)
--- ═══════════════════════════════════
-def("input","isrbxactive",{"isgameactive"},function()
-    local r = isrbxactive()
-    assert(type(r)=="boolean","Must return boolean")
-    return "isrbxactive = " .. tostring(r)
-end)
-def("input","mouse1click",{})    def("input","mouse1press",{})    def("input","mouse1release",{})
-def("input","mouse2click",{})    def("input","mouse2press",{})    def("input","mouse2release",{})
-def("input","mousemoveabs",{})   def("input","mousemoverel",{})   def("input","mousescroll",{})
-
--- ═══════════════════════════════════
---  INSTANCES  (14)
--- ═══════════════════════════════════
-def("instances","fireclickdetector",{},function()
-    local det = Instance.new("ClickDetector")
-    local ok, err = pcall(function() fireclickdetector(det, 0, "MouseClick") end)
-    assert(ok, "fireclickdetector threw: " .. tostring(err))
-end)
-
-def("instances","getcallbackvalue",{},function()
-    local b = Instance.new("BindableFunction")
-    local function cb() return "real_cb" end
-    b.OnInvoke = cb
-    local got = getcallbackvalue(b, "OnInvoke")
-    assert(got == cb,               "Must return exact function reference")
-    assert(got() == "real_cb",      "Retrieved function must work correctly")
-end)
-
-def("instances","getconnections",{},function()
-    local b = Instance.new("BindableEvent")
-    b.Event:Connect(function() end)
-    local conns = getconnections(b.Event)
-    assert(type(conns)=="table" and #conns>=1,"Must return table with connections")
-    local c = conns[1]
-    assert(type(c.Fire)=="function",       "Missing Fire function")
-    assert(type(c.Disconnect)=="function", "Missing Disconnect function")
-    assert(type(c.Enable)=="function",     "Missing Enable function")
-    assert(type(c.Disable)=="function",    "Missing Disable function")
-    c:Disconnect()
-    local after = getconnections(b.Event)
-    assert(#after==0 or after[1].Enabled==false, "Disconnect did not work")
-end)
-
-def("instances","getcustomasset",{},function()
-    writefile(".ifert/ca1.txt","asset1"); writefile(".ifert/ca2.txt","asset2")
-    local id1 = getcustomasset(".ifert/ca1.txt")
-    local id2 = getcustomasset(".ifert/ca2.txt")
-    assert(id1:match("rbxasset://"), "Must be rbxasset URL")
-    assert(id1 ~= id2, "Different files must give different IDs — fake detected")
-end)
-
-def("instances","gethiddenproperty",{},function()
-    local fire = Instance.new("Fire")
-    local v, h = gethiddenproperty(fire, "size_xml")
-    assert(v == 5,    "size_xml default must be 5, got " .. tostring(v))
-    assert(h == true, "size_xml must be hidden")
-    local _, sh = gethiddenproperty(fire, "Size")
-    assert(sh == false, "Size isHidden must be false")
-end)
-
-def("instances","sethiddenproperty",{},function()
-    local fire = Instance.new("Fire")
-    local prev = sethiddenproperty(fire, "size_xml", 99)
-    assert(prev == true,                        "Must return true for hidden prop")
-    assert(gethiddenproperty(fire,"size_xml")==99,"size_xml must now be 99")
-end)
-
-def("instances","gethui",{},function()
-    local hui = gethui()
-    assert(typeof(hui)=="Instance",            "Must return Instance")
-    assert(hui ~= game:GetService("CoreGui"), "Must not return CoreGui directly")
-end)
-
-def("instances","getinstances",{},function()
-    local insts = getinstances()
-    assert(type(insts)=="table", "Must return table")
-    assert(#insts > 100, "Expected >100 instances, got " .. tostring(#insts) .. " — fake detected")
-    assert(insts[1]:IsA("Instance"), "Entries must be Instances")
-end)
-
-def("instances","getnilinstances",{},function()
-    local nilPart = Instance.new("Part"); nilPart.Parent = nil
-    local nilInsts = getnilinstances()
-    assert(type(nilInsts)=="table" and #nilInsts>0,"Must return non-empty table")
-    local found = false
-    for _, inst in ipairs(nilInsts) do
-        assert(inst.Parent == nil, "Entry has non-nil parent")
-        if inst == nilPart then found = true end
-    end
-    assert(found, "Our nil-parented Part was not in getnilinstances")
-end)
-
-def("instances","isscriptable",{},function()
-    local fire = Instance.new("Fire")
-    assert(isscriptable(fire,"size_xml")==false,"size_xml must be non-scriptable")
-    assert(isscriptable(fire,"Size")==true,     "Size must be scriptable")
-    assert(isscriptable(fire,"size_xml") ~= isscriptable(fire,"Size"),"always-same fake")
-end)
-
-def("instances","setscriptable",{},function()
-    local fire = Instance.new("Fire")
-    local prev = setscriptable(fire, "size_xml", true)
-    assert(prev == false,                        "Must return previous state (false)")
-    assert(isscriptable(fire,"size_xml")==true,  "Must now be scriptable")
-    setscriptable(fire, "size_xml", false)
-    assert(isscriptable(fire,"size_xml")==false, "Revert must work")
-end)
-
-def("instances","setrbxclipboard",{})
-
-def("instances","fireproximityprompt",{},function()
-    local pp = Instance.new("ProximityPrompt", Instance.new("Part"))
-    local ok, err = pcall(function() fireproximityprompt(pp) end)
-    assert(ok, "fireproximityprompt threw: " .. tostring(err))
-end)
-
-def("instances","firetouchinterest",{},function()
-    local ws  = game:GetService("Workspace")
-    local p1  = Instance.new("Part", ws)
-    local p2  = Instance.new("Part", ws)
-    local ok, _ = pcall(function() firetouchinterest(p1, p2, 0) end)
-    assert(ok, "firetouchinterest threw an error")
-    p1:Destroy(); p2:Destroy()
-end)
-
--- ═══════════════════════════════════
---  METATABLE  (6)
--- ═══════════════════════════════════
-def("metatable","getrawmetatable",{},function()
-    local mt  = {__metatable="locked"}
-    local obj = setmetatable({}, mt)
-    assert(getmetatable(obj)=="locked","Sanity: should be locked")
-    local raw = getrawmetatable(obj)
-    assert(raw == mt,              "Must return actual metatable")
-    assert(raw.__metatable=="locked","Must contain __metatable field")
-end)
-
-def("metatable","hookmetamethod",{},function()
-    local called = false
-    local obj = setmetatable({},{__index=newcclosure(function() return "pre" end),__metatable="L"})
-    local origRef = hookmetamethod(obj, "__index", function(_, k) called=true; return "post_"..k end)
-    assert(type(origRef)=="function","Must return original function")
-    assert(origRef()=="pre","origRef must call original")
-    local r = obj.testkey
-    assert(called,                 "Hook was never called")
-    assert(r=="post_testkey",      "Hook must control return value, got: " .. tostring(r))
-end)
-
-def("metatable","getnamecallmethod",{},function()
-    local cap, ref = nil, nil
-    ref = hookmetamethod(game, "__namecall", function(...)
-        if not cap then cap = getnamecallmethod() end
-        return ref(...)
-    end)
-    game:GetService("Lighting")
-    assert(cap == "GetService", "Expected 'GetService', got: " .. tostring(cap))
-    hookmetamethod(game, "__namecall", ref)
-end)
-
-def("metatable","isreadonly",{},function()
-    local norm = {}; local froz = {}; table.freeze(froz)
-    assert(isreadonly(norm)==false,"Unfrozen must be false")
-    assert(isreadonly(froz)==true, "Frozen must be true")
-    assert(isreadonly(norm) ~= isreadonly(froz),"always-same fake detected")
-end)
-
-def("metatable","setrawmetatable",{},function()
-    local obj = setmetatable({},{__index=function() return "before" end,__metatable="L"})
-    assert(obj.x=="before","Sanity failed")
-    setrawmetatable(obj,{__index=function() return "after" end})
-    assert(obj.x=="after","setrawmetatable did not replace metatable")
-end)
-
-def("metatable","setreadonly",{},function()
-    local tbl = {v="original"}; table.freeze(tbl)
-    local ok1 = pcall(function() tbl.v="fail" end)
-    assert(not ok1,"Write must fail while frozen")
-    setreadonly(tbl, false)
-    local ok2 = pcall(function() tbl.v="mutated" end)
-    assert(ok2,             "Write must succeed after unfreeze")
-    assert(tbl.v=="mutated","Value must actually change")
-end)
-
--- ═══════════════════════════════════
---  MISC  (8)
--- ═══════════════════════════════════
-def("misc","identifyexecutor",{"getexecutorname"},function()
-    local n, v = identifyexecutor()
-    assert(type(n)=="string" and #n>0,"Must return non-empty name")
-    assert(n~="Unknown" and n~="executor","Suspicious placeholder: " .. n)
-    return "Executor: " .. n .. (v and " " .. tostring(v) or "")
-end)
-
-def("misc","lz4compress",{},function()
-    local raw = "IFert lz4 test 1234567890!!"
-    local comp = lz4compress(raw)
-    assert(type(comp)=="string", "Must return string")
-    assert(comp ~= raw,          "Compressed must differ from original")
-    assert(lz4decompress(comp,#raw)==raw,"Round-trip failed")
-    assert(lz4compress("aaa") ~= lz4compress("bbb"),"Same output for different inputs — fake")
-end)
-
-def("misc","lz4decompress",{},function()
-    local raw = "IFert decompress!!"
-    assert(lz4decompress(lz4compress(raw),#raw)==raw,"Must recover original")
-end)
-
-def("misc","messagebox",{})
-def("misc","queue_on_teleport",{"queueonteleport"})
-
-def("misc","request",{"http.request","http_request"},function()
-    local r = request({Url="https://httpbin.org/get",Method="GET"})
-    assert(r.StatusCode==200,"GET should return 200, got " .. tostring(r.StatusCode))
-    local r2 = request({Url="https://httpbin.org/status/418",Method="GET"})
-    assert(r2.StatusCode==418,"418 endpoint should return 418")
-    local rp = request({Url="https://httpbin.org/post",Method="POST",
-        Headers={["Content-Type"]="application/json"},Body='{"ifert":"test"}'})
-    local d = HttpService:JSONDecode(rp.Body)
-    assert(d.json and d.json.ifert=="test","POST body not echoed correctly")
-end)
-
-def("misc","setclipboard",{"toclipboard"})
-
-def("misc","setfpscap",{},function()
-    setfpscap(30); task.wait(0.3)
-    local frames = 0; local conn
-    conn = RunService.RenderStepped:Connect(function() frames = frames + 1 end)
-    task.wait(1); conn:Disconnect(); setfpscap(0)
-    assert(frames <= 45,"FPS cap 30 not working — got " .. frames .. "fps (too high)")
-    return "~" .. frames .. "fps at cap 30"
-end)
-
--- ═══════════════════════════════════
---  SCRIPTS  (13)
--- ═══════════════════════════════════
-def("scripts","getgc",{},function()
-    local gc = getgc()
-    assert(type(gc)=="table" and #gc>100,"Must return >100 items, got " .. tostring(#gc))
-    local hasF, hasT = false, false
-    for _, v in ipairs(gc) do
-        if type(v)=="function" then hasF=true end
-        if type(v)=="table"    then hasT=true end
-        if hasF and hasT then break end
-    end
-    assert(hasF,"No functions in getgc — suspicious"); assert(hasT,"No tables in getgc — suspicious")
-end)
-
-def("scripts","getgenv",{},function()
-    local key = "__IFert_" .. tostring(math.random(100000,999999))
-    getgenv()[key] = "genv_ok"
-    assert(getfenv(0)[key]=="genv_ok","getgenv set did not reflect via getfenv")
-    getgenv()[key] = nil
-end)
-
-def("scripts","getloadedmodules",{},function()
-    local mods = getloadedmodules()
-    assert(type(mods)=="table" and #mods>0,"Must return non-empty table")
-    assert(mods[1]:IsA("ModuleScript"),"Entry must be ModuleScript, got " .. mods[1].ClassName)
-end)
-
-def("scripts","getrenv",{},function()
-    local renv = getrenv()
-    assert(type(renv)=="table","Must return table")
-    assert(renv ~= getfenv(0),"Must differ from executor env")
-    assert(renv._G ~= _G,     "renv._G must differ from executor _G")
-    assert(renv.print == print,"renv must contain standard globals")
-end)
-
-def("scripts","getrunningscripts",{},function()
-    local scripts = getrunningscripts()
-    assert(type(scripts)=="table" and #scripts>0,"Must return non-empty table")
-    assert(scripts[1]:IsA("LocalScript") or scripts[1]:IsA("ModuleScript"),"Entry must be script type")
-end)
-
-def("scripts","getscriptbytecode",{"dumpstring"},function()
-    local a = LP.Character and LP.Character:FindFirstChild("Animate")
-    assert(a,"Character.Animate not found")
-    local bc = getscriptbytecode(a)
-    assert(type(bc)=="string" and #bc>50,"Bytecode too short (" .. tostring(#bc) .. " bytes) — fake")
-    local b = string.byte(bc,1)
-    return "Bytecode " .. #bc .. " bytes, header=0x" .. string.format("%02X",b)
-end)
-
-def("scripts","getscripthash",{},function()
-    local a = LP.Character and LP.Character:FindFirstChild("Animate")
-    assert(a,"Animate not found")
-    local cl = a:Clone(); local h1 = getscripthash(cl)
-    assert(type(h1)=="string" and #h1>0,"Must return non-empty string")
-    local orig = cl.Source
-    cl.Source = "-- IFert " .. tostring(math.random())
-    local h2 = getscripthash(cl)
-    assert(h1 ~= h2,"Hash did not change after source change — fake")
-    cl.Source = orig
-    assert(getscripthash(cl)==h1,"Hash did not restore after reverting")
-end)
-
-def("scripts","getscripts",{},function()
-    local scripts = getscripts()
-    assert(type(scripts)=="table" and #scripts>0,"Must return non-empty table")
-    assert(scripts[1]:IsA("LocalScript") or scripts[1]:IsA("ModuleScript"),"Entry must be script type")
-end)
-
-def("scripts","getsenv",{},function()
-    local a = LP.Character and LP.Character:FindFirstChild("Animate")
-    assert(a,"Animate not found")
-    local env = getsenv(a)
-    assert(type(env)=="table","Must return table")
-    assert(env.script==a,    "env.script must equal the queried script")
-    assert(env.game==game,   "env must contain game")
-end)
-
-def("scripts","getthreadidentity",{"getidentity","getthreadcontext"},function()
-    local id = getthreadidentity()
-    assert(type(id)=="number","Must return number")
-    assert(id>=0 and id<=8,  "Identity must be 0-8, got " .. tostring(id))
-    return "Identity: " .. id
-end)
-
-def("scripts","setthreadidentity",{"setidentity","setthreadcontext"},function()
-    local orig = getthreadidentity()
-    setthreadidentity(6)
-    assert(getthreadidentity()==6,"Failed to set identity to 6")
-    setthreadidentity(orig)
-    assert(getthreadidentity()==orig,"Failed to restore identity")
-end)
-
-def("scripts","getscriptclosure",{"getscriptfunction"},function()
-    local m    = game:GetService("CoreGui").RobloxGui.Modules.Common.Constants
-    local real = getrenv().require(m)
-    local gen  = getscriptclosure(m)()
-    assert(real ~= gen,"Must return new table")
-    local rk, gk = 0, 0
-    for _ in pairs(real) do rk=rk+1 end
-    for _ in pairs(gen)  do gk=gk+1 end
-    assert(rk==gk,"Key count mismatch real=" .. rk .. " gen=" .. gk)
-end)
-
-def("scripts","require",{},function()
-    local mods = getloadedmodules()
-    assert(#mods>0,"No loaded modules to test require with")
-    local m = mods[1]
-    local r = getrenv().require(m)
-    assert(r ~= nil,"require returned nil for " .. m.Name)
-end)
-
--- ═══════════════════════════════════
---  DRAWING  (9)
--- ═══════════════════════════════════
-def("drawing","Drawing",{},function()
-    assert(Drawing ~= nil,        "Drawing global must exist")
-    assert(Drawing.new ~= nil,    "Drawing.new must exist")
-    assert(Drawing.Fonts ~= nil,  "Drawing.Fonts must exist")
-end)
-
-def("drawing","Drawing.new",{},function()
-    for _, dtype in ipairs({"Square","Circle","Line","Text","Triangle","Quad"}) do
-        local ok, d = pcall(function() return Drawing.new(dtype) end)
-        assert(ok, "Drawing.new('" .. dtype .. "') threw: " .. tostring(d))
-        assert(d ~= nil, "Drawing.new returned nil for " .. dtype)
-        d.Visible = false; pcall(function() d:Destroy() end)
-    end
-end)
-
-def("drawing","Drawing.Fonts",{},function()
-    assert(Drawing.Fonts.UI        == 0, "UI must be 0")
-    assert(Drawing.Fonts.System    == 1, "System must be 1")
-    assert(Drawing.Fonts.Plex      == 2, "Plex must be 2")
-    assert(Drawing.Fonts.Monospace == 3, "Monospace must be 3")
-end)
-
-def("drawing","isrenderobj",{},function()
-    local d = Drawing.new("Square"); d.Visible = false
-    assert(isrenderobj(d)          == true,  "Drawing must be render obj")
-    assert(isrenderobj(newproxy()) == false, "Proxy must not be render obj")
-    assert(isrenderobj({})         == false, "Table must not be render obj")
-    assert(isrenderobj(9999)       == false, "Number must not — always-true fake check")
-    d:Destroy()
-end)
-
-def("drawing","getrenderproperty",{},function()
-    local d = Drawing.new("Square"); d.Visible=true; d.Filled=true
-    assert(getrenderproperty(d,"Visible")==true, "Visible should be true")
-    assert(getrenderproperty(d,"Filled")==true,  "Filled should be true")
-    d:Destroy()
-end)
-
-def("drawing","setrenderproperty",{},function()
-    local d = Drawing.new("Square"); d.Visible=true
-    setrenderproperty(d,"Visible",false)
-    assert(d.Visible==false,"Visible must now be false")
-    setrenderproperty(d,"Color",Color3.fromRGB(0,255,0))
-    assert(d.Color.G>0.9 and d.Color.R<0.1,"Color not set correctly")
-    d:Destroy()
-end)
-
-def("drawing","cleardrawcache",{},function()
-    for i = 1, 3 do local d=Drawing.new("Square"); d.Visible=false end
-    local ok, err = pcall(cleardrawcache)
-    assert(ok,"cleardrawcache threw: " .. tostring(err))
-end)
-
-def("drawing","Drawing.Text",{},function()
-    local d = Drawing.new("Text")
-    d.Text = "IFert"; d.Size = 18; d.Visible = false
-    d.Font = Drawing.Fonts.UI; d.Color = Color3.fromRGB(255,0,0)
-    d.Position = Vector2.new(100,100)
-    assert(d.Text == "IFert","Text property not set correctly")
-    d:Destroy()
-end)
-
-def("drawing","Drawing.Image",{},function()
-    local d = Drawing.new("Image")
-    d.Visible = false; d.Size = Vector2.new(100,100); d.Position = Vector2.new(0,0)
-    assert(isrenderobj(d),"Image must be render obj")
-    d:Destroy()
-end)
-
--- ═══════════════════════════════════
---  WEBSOCKET  (3)
--- ═══════════════════════════════════
-def("websocket","WebSocket",{},function()
-    assert(WebSocket ~= nil,                    "WebSocket must exist")
-    assert(type(WebSocket.connect)=="function", "WebSocket.connect must be function")
-end)
-
-def("websocket","WebSocket.connect",{},function()
-    local ws = WebSocket.connect("ws://echo.websocket.events")
-    assert(ws ~= nil,                     "connect returned nil")
-    assert(type(ws.Send)=="function",     "ws.Send must be function")
-    assert(type(ws.Close)=="function",    "ws.Close must be function")
-    assert(ws.OnMessage ~= nil,           "ws.OnMessage must exist")
-    local received = nil
-    ws.OnMessage:Connect(function(msg) received = msg end)
-    local testMsg = "IFert_" .. tostring(math.random(1000,9999))
-    ws:Send(testMsg)
-    local t = tick()
-    repeat task.wait(0.1) until received or (tick()-t > 4)
-    ws:Close()
-    assert(received ~= nil,       "Echo server did not respond within 4s")
-    assert(received == testMsg,   "Echo mismatch — sent:" .. testMsg .. " got:" .. tostring(received))
-end)
-
-def("websocket","WebSocket.wss",{},function()
-    local ws = WebSocket.connect("wss://echo.websocket.events")
-    assert(ws ~= nil,"WSS connect returned nil")
-    local msgs = {}
-    ws.OnMessage:Connect(function(m) table.insert(msgs,m) end)
-    ws:Send("ping1"); ws:Send("ping2"); ws:Send("ping3")
-    local t = tick()
-    repeat task.wait(0.1) until #msgs >= 3 or (tick()-t > 5)
-    ws:Close()
-    assert(#msgs == 3,"Expected 3 echoed messages, got " .. #msgs)
-end)
-
--- ═══════════════════════════════════
---  ENVIRONMENT  (8)
--- ═══════════════════════════════════
-def("environment","getfenv",{},function()
-    local env = getfenv(0)
-    assert(type(env)=="table", "getfenv(0) must return table")
-    assert(env.print == print, "Must contain print")
-    assert(env.game  == game,  "Must contain game")
-end)
-
-def("environment","setfenv",{},function()
-    local f = function() return myTestGlobal end
-    setfenv(f, setmetatable({myTestGlobal="ifert_env"},{__index=getfenv(0)}))
-    assert(f()=="ifert_env","setfenv did not set custom environment")
-end)
-
-def("environment","getrawenv",{},function()
-    local ok, r = pcall(function() return getrawenv and getrawenv(0) end)
-    if not ok or r == nil then return "getrawenv not supported" end
-    assert(type(r)=="table","getrawenv must return table")
-end)
-
-def("environment","syn.protect_gui",{},function()
-    if not (syn and syn.protect_gui) then return "syn.protect_gui not present" end
-    local sg = Instance.new("ScreenGui")
-    local ok, err = pcall(function() syn.protect_gui(sg) end)
-    assert(ok,"syn.protect_gui threw: " .. tostring(err))
-end)
-
-def("environment","syn.queue_on_teleport",{},function()
-    if not (syn and syn.queue_on_teleport) then return "syn.queue_on_teleport not present" end
-    local ok, _ = pcall(function() syn.queue_on_teleport("print('hello')") end)
-    assert(ok,"syn.queue_on_teleport threw")
-end)
-
-def("environment","getmenv",{},function()
-    local ok, r = pcall(function() return getmenv and getmenv() end)
-    if not ok or r == nil then return "getmenv not supported" end
-    assert(type(r)=="table","getmenv must return table")
-end)
-
-def("environment","hookfunction_restore",{},function()
-    local function orig() return "A" end
-    local ref = hookfunction(orig, function() return "B" end)
-    assert(orig()=="B","Hook must intercept")
-    hookfunction(orig, ref)
-    assert(orig()=="A","Restore via hookfunction must work")
-end)
-
-def("environment","checkcaller_scope",{},function()
-    assert(checkcaller()==true,"Root level must be executor — true")
-    local inner = nil
-    local function nested() inner = checkcaller() end
-    nested()
-    assert(type(inner)=="boolean","checkcaller in nested fn must return boolean")
-end)
-
--- ═══════════════════════════════════
---  TABLE LIB  (8)
--- ═══════════════════════════════════
-def("table_lib","table.freeze",{},function()
-    local t = {x=1}; table.freeze(t)
-    local ok = pcall(function() t.x=2 end)
-    assert(not ok,"Frozen table must reject writes")
-    assert(t.x==1,"Value must be unchanged")
-end)
-
-def("table_lib","table.isfrozen",{},function()
-    local t1={}; local t2={}; table.freeze(t2)
-    assert(table.isfrozen(t1)==false,"Unfrozen must return false")
-    assert(table.isfrozen(t2)==true, "Frozen must return true")
-end)
-
-def("table_lib","table.clone",{},function()
-    local orig = {a=1,b={c=2}}
-    local cl   = table.clone(orig)
-    assert(cl ~= orig,  "Clone must be different table")
-    assert(cl.a == 1,   "Clone must copy values")
-    cl.a = 99
-    assert(orig.a == 1, "Clone must be shallow — original unchanged")
-end)
-
-def("table_lib","table.clear",{},function()
-    local t = {1,2,3,x=4}; table.clear(t)
-    assert(next(t)==nil,"table.clear must empty the table")
-end)
-
-def("table_lib","table.find",{},function()
-    local t = {"a","b","c","d"}
-    assert(table.find(t,"c")==3,   "Must find 'c' at index 3")
-    assert(table.find(t,"z")==nil, "Must return nil for missing value")
-    assert(table.find(t,"b",3)==nil,"Must respect start offset")
-end)
-
-def("table_lib","table.move",{},function()
-    local src={1,2,3,4,5}; local dst={10,20,30}
-    table.move(src,2,4,2,dst)
-    assert(dst[2]==2 and dst[3]==3 and dst[4]==4,"table.move failed")
-end)
-
-def("table_lib","table.pack",{},function()
-    local p = table.pack(10,20,30)
-    assert(p.n==3,"p.n must be 3")
-    assert(p[1]==10 and p[2]==20 and p[3]==30,"Values must match")
-end)
-
-def("table_lib","table.unpack",{},function()
-    local t = {5,6,7,8}
-    local a,b,c,d = table.unpack(t)
-    assert(a==5 and b==6 and c==7 and d==8,"table.unpack failed")
-    local x,y = table.unpack(t,2,3)
-    assert(x==6 and y==7,"table.unpack with range failed")
-end)
-
--- ═══════════════════════════════════
---  COROUTINE LIB  (7)
--- ═══════════════════════════════════
-def("coroutine_lib","coroutine.running",{},function()
-    local co = coroutine.create(function()
-        local r, m = coroutine.running()
-        assert(r ~= nil, "coroutine.running() inside coroutine must not be nil")
-        assert(m == false,"main flag must be false inside coroutine")
-    end)
-    coroutine.resume(co)
-end)
-
-def("coroutine_lib","coroutine.status",{},function()
-    local co = coroutine.create(function() coroutine.yield() end)
-    assert(coroutine.status(co)=="suspended","New coroutine must be suspended")
-    coroutine.resume(co)
-    assert(coroutine.status(co)=="suspended","After yield must be suspended")
-    coroutine.resume(co)
-    assert(coroutine.status(co)=="dead","After completion must be dead")
-end)
-
-def("coroutine_lib","coroutine.wrap",{},function()
-    local gen = coroutine.wrap(function()
-        for i=1,3 do coroutine.yield(i) end
-    end)
-    assert(gen()==1,"First yield must be 1")
-    assert(gen()==2,"Second yield must be 2")
-    assert(gen()==3,"Third yield must be 3")
-end)
-
-def("coroutine_lib","coroutine.yield",{},function()
-    local results = {}
-    local co = coroutine.create(function()
-        table.insert(results, coroutine.yield("a"))
-        table.insert(results, coroutine.yield("b"))
-    end)
-    local _, v1 = coroutine.resume(co)
-    local _, v2 = coroutine.resume(co,"x")
-    coroutine.resume(co,"y")
-    assert(v1=="a" and v2=="b","Yield values wrong")
-    assert(results[1]=="x" and results[2]=="y","Resume pass-through values wrong")
-end)
-
-def("coroutine_lib","coroutine.resume",{},function()
-    local co = coroutine.create(function(a,b) return a+b end)
-    local ok, res = coroutine.resume(co, 10, 20)
-    assert(ok==true and res==30,"Resume must succeed and return sum")
-    local ok2, err = coroutine.resume(co)
-    assert(ok2==false and type(err)=="string","Dead coroutine must return false + error string")
-end)
-
-def("coroutine_lib","task.spawn",{},function()
-    local done = false
-    task.spawn(function() done = true end)
-    task.wait()
-    assert(done,"task.spawn must execute the function")
-end)
-
-def("coroutine_lib","task.defer",{},function()
-    local order = {}
-    task.defer(function() table.insert(order,"deferred") end)
-    table.insert(order,"immediate")
-    task.wait()
-    assert(order[1]=="immediate","immediate must run first")
-    assert(order[2]=="deferred", "deferred must run after")
-end)
-
--- ═══════════════════════════════════
---  ACTORS  (8)  getactors / run_on_actor
--- ═══════════════════════════════════
-def("actors","getactors",{},function()
-    -- getactors returns all Actor instances in the DataModel
-    local ok, result = pcall(function() return getactors() end)
-    if not ok then return "getactors not supported on this executor" end
-    assert(type(result)=="table","getactors must return a table")
-    -- Result may be empty if game has no actors — that's fine, just check types
-    for _, v in ipairs(result) do
-        assert(typeof(v)=="Instance","Entry must be Instance, got " .. type(v))
-        assert(v:IsA("Actor"),       "Entry must be an Actor, got " .. v.ClassName)
-    end
-    return "Found " .. #result .. " actor(s)"
-end)
-
-def("actors","run_on_actor",{},function()
-    local ok, err = pcall(function()
-        -- Create a fresh actor and try to run code on it
-        local actor = Instance.new("Actor")
-        actor.Parent = game:GetService("Workspace")
-        local result = nil
-        -- run_on_actor schedules a function on the actor's thread
-        run_on_actor(actor, function()
-            result = true
-        end)
-        task.wait(0.2)
-        actor:Destroy()
-    end)
-    if not ok then
-        -- Some executors don't have run_on_actor — check if it simply doesn't exist
-        if not getGlobal("run_on_actor") then
-            return "run_on_actor not available on this executor"
-        end
-        error("run_on_actor threw: " .. tostring(err))
-    end
-end)
-
-def("actors","Actor.SendMessage",{},function()
-    local ok, err = pcall(function()
-        local actor = Instance.new("Actor")
-        actor.Parent = game:GetService("Workspace")
-        -- SendMessage sends a tagged message to the actor
-        actor:SendMessage("IFertTest","hello")
-        actor:Destroy()
-    end)
-    assert(ok, "Actor:SendMessage threw: " .. tostring(err))
-end)
-
-def("actors","Actor.BindToMessage",{},function()
-    local received = nil
-    local ok, err = pcall(function()
-        local actor = Instance.new("Actor")
-        actor.Parent = game:GetService("Workspace")
-        actor:BindToMessage("IFertBind", function(...)
-            received = {...}
-        end)
-        actor:SendMessage("IFertBind","payload")
-        task.wait(0.15)
-        actor:Destroy()
-    end)
-    assert(ok, "Actor:BindToMessage threw: " .. tostring(err))
-    if received then
-        assert(received[1]=="payload","BindToMessage received wrong payload")
-        return "Message received: " .. tostring(received[1])
-    end
-    return "BindToMessage dispatched (async — verify manually)"
-end)
-
-def("actors","Actor.BindToMessageParallel",{},function()
-    local ok, err = pcall(function()
-        local actor = Instance.new("Actor")
-        actor.Parent = game:GetService("Workspace")
-        actor:BindToMessageParallel("IFertParallel", function() end)
-        actor:SendMessage("IFertParallel","test")
-        task.wait(0.1)
-        actor:Destroy()
-    end)
-    assert(ok, "Actor:BindToMessageParallel threw: " .. tostring(err))
-end)
-
-def("actors","desyncronize",{},function()
-    local ok, err = pcall(function()
-        -- task.desynchronize puts the script into parallel mode
-        -- Only works inside an Actor context; outside it's usually a no-op or errors
-        if task.desynchronize then
-            task.desynchronize()
-            task.synchronize()
-        end
-    end)
-    if not ok then return "task.desynchronize not supported: " .. tostring(err) end
-    return "desynchronize / synchronize OK"
-end)
-
-def("actors","task.synchronize",{},function()
-    local ok, err = pcall(function()
-        if task.synchronize then task.synchronize() end
-    end)
-    if not ok then return "task.synchronize not supported: " .. tostring(err) end
-    return "task.synchronize OK"
-end)
-
-def("actors","SharedTable",{},function()
-    local ok, err = pcall(function()
-        local st = SharedTable.new()
-        st["key"] = "IFert_value"
-        assert(st["key"]=="IFert_value","SharedTable read/write failed")
-        local size = SharedTable.size(st)
-        assert(size == 1,"SharedTable.size must return 1, got " .. tostring(size))
-        SharedTable.clear(st)
-        assert(SharedTable.size(st)==0,"SharedTable.clear must empty the table")
-    end)
-    if not ok then return "SharedTable not supported: " .. tostring(err) end
-    return "SharedTable OK"
-end)
-
--- ═══════════════════════════════════
---  SIGNAL  (5)  RBXScriptSignal deep tests
--- ═══════════════════════════════════
-def("signal","getconnections_deep",{},function()
-    local b = Instance.new("BindableEvent")
-    local fired = 0
-    b.Event:Connect(function() fired = fired + 1 end)
-    b.Event:Connect(function() fired = fired + 1 end)
-    local conns = getconnections(b.Event)
-    assert(#conns == 2,"Expected 2 connections, got " .. #conns)
-    b:Fire()
-    task.wait()
-    assert(fired == 2,"Both connections must fire")
-end)
-
-def("signal","connection.Disable_Enable",{},function()
-    local b = Instance.new("BindableEvent"); local count = 0
-    b.Event:Connect(function() count = count + 1 end)
-    local conns = getconnections(b.Event)
-    assert(#conns==1,"Expected 1 connection")
-    local c = conns[1]
-    c:Disable()
-    b:Fire(); task.wait()
-    assert(count==0,"Disabled connection must not fire")
-    c:Enable()
-    b:Fire(); task.wait()
-    assert(count==1,"Re-enabled connection must fire")
-end)
-
-def("signal","connection.Fire",{},function()
-    local b = Instance.new("BindableEvent"); local received = nil
-    b.Event:Connect(function(v) received = v end)
-    local c = getconnections(b.Event)[1]
-    c:Fire("IFert_signal_test")
-    task.wait()
-    assert(received=="IFert_signal_test","c:Fire() must trigger connection with args")
-end)
-
-def("signal","connection.Function",{},function()
-    local b = Instance.new("BindableEvent")
-    local function myFn() end
-    b.Event:Connect(myFn)
-    local c = getconnections(b.Event)[1]
-    assert(type(c.Function)=="function","Connection.Function must be a function")
-    assert(c.Function == myFn,          "Connection.Function must equal original callback")
-end)
-
-def("signal","connection.Thread",{},function()
-    local b = Instance.new("BindableEvent")
-    b.Event:Connect(function() end)
-    local c = getconnections(b.Event)[1]
-    -- Thread may be nil if not running — just check it's nil or thread
-    assert(c.Thread == nil or type(c.Thread)=="thread","Connection.Thread must be nil or thread")
-end)
-
--- ═══════════════════════════════════
---  STRING LIB  (6)  extra string functions executors expose
--- ═══════════════════════════════════
-def("string_lib","string.split",{},function()
-    local parts = string.split("a,b,c,d",",")
-    assert(type(parts)=="table","Must return table")
-    assert(#parts==4,            "Must return 4 parts, got " .. #parts)
-    assert(parts[1]=="a" and parts[4]=="d","Parts must be correct")
-end)
-
-def("string_lib","string.trim",{},function()
-    -- Roblox exposes string.trim in some contexts
-    local ok, res = pcall(function() return string.trim("  hello  ") end)
-    if not ok then return "string.trim not available" end
-    assert(res=="hello","string.trim must strip whitespace")
-end)
-
-def("string_lib","string.byte_multi",{},function()
-    local a, b, c = string.byte("ABC",1,3)
-    assert(a==65 and b==66 and c==67,"string.byte multi-return failed")
-end)
-
-def("string_lib","string.format_extended",{},function()
-    assert(string.format("%05d",42)=="00042","Zero-pad failed")
-    assert(string.format("%.3f",math.pi):sub(1,5)=="3.141","Float format failed")
-    assert(string.format("%x",255)=="ff","Hex format failed")
-end)
-
-def("string_lib","string.gmatch_captures",{},function()
-    local result = {}
-    for k,v in string.gmatch("a=1,b=2,c=3","(%a)=(%d)") do
-        table.insert(result,k .. "=" .. v)
-    end
-    assert(#result==3,"Must capture 3 pairs, got " .. #result)
-    assert(result[1]=="a=1" and result[2]=="b=2","Capture values wrong")
-end)
-
-def("string_lib","string.gsub_fn",{},function()
-    local result, n = string.gsub("hello world","(%w+)",function(w) return w:upper() end)
-    assert(result=="HELLO WORLD","gsub function replacement failed")
-    assert(n==2,"gsub must report 2 replacements")
-end)
-
--- ═══════════════════════════════════
---  RUN LOGIC
--- ═══════════════════════════════════
--- ═══════════════════════════════════
---  JSON ENCODER  (no external deps)
--- ═══════════════════════════════════
-local function jsonEncode(val)
-    local t = type(val)
-    if t == "nil" then return "null" end
-    if t == "boolean" then return val and "true" or "false" end
-    if t == "number" then
-        if val ~= val then return "null" end -- NaN
-        return tostring(math.floor(val) == val and math.floor(val) or val)
-    end
-    if t == "string" then
-        return '"' .. val:gsub('\\','\\\\'):gsub('"','\\"'):gsub('\n','\\n'):gsub('\r','\\r'):gsub('\t','\\t') .. '"'
-    end
-    if t == "table" then
-        -- Array check: all integer keys 1..n
-        local isArr = true; local n = 0
-        for k in pairs(val) do
-            n = n + 1
-            if type(k) ~= "number" or k ~= math.floor(k) or k < 1 then isArr = false; break end
-        end
-        if isArr and n > 0 then
-            local parts = {}
-            for i = 1, #val do parts[i] = jsonEncode(val[i]) end
-            return "[" .. table.concat(parts, ",") .. "]"
-        else
-            local parts = {}
-            for k, v in pairs(val) do
-                if type(k) == "string" then
-                    table.insert(parts, '"' .. k .. '":' .. jsonEncode(v))
-                end
-            end
-            return "{" .. table.concat(parts, ",") .. "}"
-        end
-    end
-    return "null"
-end
-
--- ═══════════════════════════════════
---  BASE64 ENCODER  (URL-safe)
--- ═══════════════════════════════════
-local b64chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-local function b64encode(data)
-    local result = {}
-    local padding = ""
-    local mod = #data % 3
-    if mod == 1 then data = data .. "\0\0"; padding = "=="
-    elseif mod == 2 then data = data .. "\0"; padding = "=" end
-    for i = 1, #data, 3 do
-        local a, b, c = data:byte(i), data:byte(i+1), data:byte(i+2)
-        local n = a * 65536 + b * 256 + c
-        local i1 = math.floor(n / 262144) % 64 + 1
-        local i2 = math.floor(n / 4096)   % 64 + 1
-        local i3 = math.floor(n / 64)     % 64 + 1
-        local i4 = n % 64 + 1
-        table.insert(result, b64chars:sub(i1,i1) .. b64chars:sub(i2,i2) .. b64chars:sub(i3,i3) .. b64chars:sub(i4,i4))
-    end
-    local encoded = table.concat(result)
-    if padding ~= "" then encoded = encoded:sub(1, -(#padding+1)) .. padding end
-    -- URL-safe: + -> -, / -> _
-    encoded = encoded:gsub("+","-"):gsub("/","_")
-    return encoded
-end
-
--- ═══════════════════════════════════
---  DASHBOARD URL BUILDER
--- ═══════════════════════════════════
--- Replace this with your actual hosted dashboard URL
-local DASHBOARD_URL = "https://ifert.pages.dev"
-
-local function buildDashboardURL(payload)
-    local json = jsonEncode(payload)
-    local encoded = b64encode(json)
-    return DASHBOARD_URL .. "?r=" .. encoded
-end
-
--- ═══════════════════════════════════
---  CLICKABLE LINK IN CONSOLE
--- ═══════════════════════════════════
-local function clink(text, url, color)
-    lineN = lineN + 1
-    local row = Instance.new("Frame")
-    row.Name = "L" .. lineN
-    row.Size = UDim2.new(1, 0, 0, 22)
-    row.BackgroundTransparency = 1
-    row.LayoutOrder = lineN
-    row.ZIndex = 5
-    row.Parent = ConScroll
-
-    -- Background button for hover
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 1, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(85, 108, 208)
-    btn.BackgroundTransparency = 0.88
-    btn.BorderSizePixel = 0
-    btn.Text = ""
-    btn.ZIndex = 5
-    btn.Parent = row
-    mkCorner(btn, 5)
-
-    local lb = Instance.new("TextLabel")
-    lb.Size = UDim2.new(1, 0, 1, 0)
-    lb.Position = UDim2.new(0, 8, 0, 0)
-    lb.BackgroundTransparency = 1
-    lb.Text = text
-    lb.Font = Enum.Font.Code
-    lb.TextSize = 11
-    lb.TextColor3 = color or Color3.fromRGB(124, 154, 255)
-    lb.TextXAlignment = Enum.TextXAlignment.Left
-    lb.ZIndex = 6
-    lb.Parent = row
-
-    btn.MouseEnter:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundTransparency = 0.75}):Play()
-        lb.TextColor3 = Color3.fromRGB(160, 185, 255)
-    end)
-    btn.MouseLeave:Connect(function()
-        TweenService:Create(btn, TweenInfo.new(0.12), {BackgroundTransparency = 0.88}):Play()
-        lb.TextColor3 = color or Color3.fromRGB(124, 154, 255)
-    end)
-    btn.MouseButton1Click:Connect(function()
-        -- Copy URL to clipboard so user can paste in browser
-        pcall(function()
-            if setclipboard then setclipboard(url)
-            elseif syn and syn.set_clipboard then syn.set_clipboard(url)
-            elseif toclipboard then toclipboard(url) end
-        end)
-        lb.Text = "  ✅  Copied to clipboard!"
-        task.delay(2, function() lb.Text = text end)
-    end)
-
-    task.defer(function()
-        ConScroll.CanvasPosition = Vector2.new(0, math.max(0, ConScroll.AbsoluteCanvasSize.Y - ConScroll.AbsoluteSize.Y + 8))
-    end)
-end
-
--- ═══════════════════════════════════
---  RUN ALL
--- ═══════════════════════════════════
-local function runAll()
-    if State.isRunning then return end
-    State.isRunning = true
-    clearCon()
-    if State.ddOpen then setDD(false) end
-
-    TweenService:Create(RunBtn, TweenInfo.new(0.12), {BackgroundColor3 = T.AccentDim}):Play()
-    RunBtn.Text = "  Running..."
-
-    pcall(function()
-        if isfolder and makefolder and not isfolder(".ifert") then makefolder(".ifert") end
-    end)
-
-    local delay = math.max(0, tonumber(DelBox.Text) or 0.05)
-
-    clog("─────────────────────────────────────────────", T.Border)
-    clog("  IFert  UNC Check  v3.1  |  " .. #AllTests .. " tests", T.Info)
-    clog("  ✅ Pass   ⛔ Fail   ⏺ No Test   ⚠ Alias", T.TextDim)
-    clog("─────────────────────────────────────────────", T.Border)
-
-    local running = 0
-    local lastCat = nil
-
-    -- Collect every test result for the dashboard
-    local resultsList = {}
-
-    local function runOne(td)
-        running = running + 1
-        task.spawn(function()
-            if State.skipped[td.category] then running = running - 1; return end
-
-            if td.category ~= lastCat then
-                lastCat = td.category
-                csep()
-                local cn = td.category
-                for _, c in ipairs(Categories) do
-                    if c.id == td.category then cn = c.name; break end
-                end
-                clog("  ▸ " .. string.upper(cn), T.Accent)
-            end
-
-            local rowStatus = "notest"
-            local rowMsg    = nil
-
-            if not td.callback then
-                State.notest = State.notest + 1
-                rowStatus    = "notest"
-                clog("  ⏺  " .. td.name, T.TextMuted)
-
-            elseif not getGlobal(td.name) then
-                State.fails = State.fails + 1
-                rowStatus   = "fail"
-                rowMsg      = "global not found"
-                clog("  ⛔  " .. td.name .. "  —  global not found", T.Fail)
-
-            else
-                local ok, msg = pcall(td.callback)
-                if ok then
-                    State.passes = State.passes + 1
-                    rowStatus    = "pass"
-                    if type(msg) == "string" then
-                        rowMsg = msg
-                        clog("  ✅  " .. td.name .. "  •  " .. msg, T.Success)
-                    else
-                        clog("  ✅  " .. td.name, T.Success)
-                    end
-                else
-                    State.fails = State.fails + 1
-                    rowStatus   = "fail"
-                    rowMsg      = tostring(msg):match(":%d+: (.+)") or tostring(msg)
-                    -- Trim long error messages
-                    if #rowMsg > 120 then rowMsg = rowMsg:sub(1,117) .. "..." end
-                    clog("  ⛔  " .. td.name .. "  —  " .. rowMsg, T.Fail)
-                end
-            end
-
-            -- Alias warnings
-            local miss = {}
-            for _, al in ipairs(td.aliases) do
-                if getGlobal(al) == nil then table.insert(miss, al) end
-            end
-            if #miss > 0 then
-                State.aliasWarn = State.aliasWarn + 1
-                clog("  ⚠   aliases missing: " .. table.concat(miss,", "), T.Warn)
-            end
-
-            -- Store result for dashboard
-            local entry = {
-                name     = td.name,
-                status   = rowStatus,
-                category = td.category,
-            }
-            if rowMsg then entry.message = rowMsg end
-            table.insert(resultsList, entry)
-
-            running = running - 1
-        end)
-    end
-
-    for _, td in ipairs(AllTests) do
-        runOne(td)
-        if delay > 0 then task.wait(delay) else task.wait() end
-    end
-
-    task.defer(function()
-        repeat task.wait() until running == 0
-
-        -- ─ Detect executor info for dashboard ──────────
-        local execName    = "Unknown"
-        local execVersion = nil
-        local execIdent   = nil
-        pcall(function()
-            if identifyexecutor then
-                execName, execVersion = identifyexecutor()
-                execName = tostring(execName)
-                if execVersion then execVersion = tostring(execVersion) end
-            end
-        end)
-        pcall(function()
-            if getthreadidentity then execIdent = getthreadidentity() end
-        end)
-
-        -- ─ Summary ─────────────────────────────────────
-        csep()
-        clog("─────────────────────────────────────────────", T.Border)
-        local total  = State.passes + State.fails
-        local tested = total
-        if tested > 0 then
-            local rate = math.floor(State.passes / tested * 100 + 0.5)
-            clog("  📊  " .. rate .. "% pass  (" .. State.passes .. "/" .. tested .. ")", T.Info)
-        end
-        clog("  ✅  " .. State.passes   .. " passed",          T.Success)
-        clog("  ⛔  " .. State.fails    .. " failed",          T.Fail)
-        clog("  ⏺  " .. State.notest   .. " no-test",         T.TextMuted)
-        clog("  ⚠   " .. State.aliasWarn .. " alias warnings", T.Warn)
-        clog("─────────────────────────────────────────────", T.Border)
-        clog("  Executor: " .. execName .. (execVersion and " " .. execVersion or ""), T.Accent)
-        if execIdent then
-            clog("  Identity: Level " .. tostring(execIdent), T.TextDim)
-        end
-        clog("─────────────────────────────────────────────", T.Border)
-
-        -- ─ Build dashboard payload ──────────────────────
-        local payload = {
-            executor   = execName,
-            version    = execVersion or "",
-            identity   = execIdent or 0,
-            date       = os.date and os.date("%Y-%m-%d") or "unknown",
-            passes     = State.passes,
-            fails      = State.fails,
-            notest     = State.notest,
-            aliasWarn  = State.aliasWarn,
-            results    = resultsList,
-        }
-
-        local url = buildDashboardURL(payload)
-
-        csep()
-        clog("  🌐  Results Dashboard Ready:", T.Info)
-        clog("  Click below to copy your results link", T.TextDim)
-        csep()
-        clink("  🔗  Open Dashboard  →  " .. DASHBOARD_URL, url, Color3.fromRGB(124, 154, 255))
-        csep()
-        clog("  (Click the link above to copy URL to clipboard)", T.TextMuted)
-        clog("  Then paste it in your browser.", T.TextMuted)
-        clog("─────────────────────────────────────────────", T.Border)
-        clog("  IFert v3.1 complete.", T.Accent)
-
-        State.isRunning = false
-        TweenService:Create(RunBtn, TweenInfo.new(0.15), {BackgroundColor3 = T.Accent}):Play()
-        RunBtn.Text = "  Run Test"
-    end)
-end
-
-RunBtn.MouseButton1Click:Connect(runAll)
-
--- ═══════════════════════════════════
---  OPEN ANIMATION
--- ═══════════════════════════════════
-Main.Size = UDim2.new(0, WIN_W, 0, 0)
-Main.BackgroundTransparency = 0.5
-TweenService:Create(Main, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Size = UDim2.new(0, WIN_W, 0, WIN_H),
-    BackgroundTransparency = 0.08,
-}):Play()
-
-task.delay(0.35, function()
-    clog("  Welcome to IFert v3.1", T.Accent)
-    clog("  " .. #AllTests .. " tests across " .. #Categories .. " categories.", T.TextDim)
-    clog("  Open dropdown to skip categories, then Run Test.", T.TextDim)
-    csep()
-end)
-
-print("[IFert] v3.1 loaded — " .. #AllTests .. " tests")
+function renderList() {
+  const list = document.getElementById('results-list');
+  list.innerHTML = '';
+
+  const filtered = currentFilter === 'all'
+    ? allRows
+    : allRows.filter(r => r.status === currentFilter);
+
+  // Group by category
+  const cats = {};
+  for (const r of filtered) {
+    const cat = r.category || 'misc';
+    if (!cats[cat]) cats[cat] = [];
+    cats[cat].push(r);
+  }
+
+  let delay = 0;
+  for (const [cat, rows] of Object.entries(cats)) {
+    // Category header
+    const hdr = document.createElement('div');
+    hdr.className = 'cat-header';
+    hdr.innerHTML = cat.toUpperCase() + '<div class="cat-header-line"></div>';
+    list.appendChild(hdr);
+
+    for (const r of rows) {
+      const row = document.createElement('div');
+      row.className = 'result-row ' + (r.status || 'notest');
+      row.style.animationDelay = delay + 's';
+      delay = Math.min(delay + 0.02, 0.5);
+
+      const icon = { pass: '✓', fail: '✗', notest: '○', alias: '⚠' }[r.status] || '?';
+      const msg  = r.message ? `<span class="result-msg">${escHtml(r.message)}</span>` : '';
+
+      row.innerHTML = `
+        <div class="result-icon ${r.status || 'notest'}">${icon}</div>
+        <span class="result-name">${escHtml(r.name)}</span>
+        ${msg}
+      `;
+      list.appendChild(row);
+    }
+  }
+
+  if (list.children.length === 0) {
+    list.innerHTML = `<div style="font-family:var(--mono);font-size:12px;color:var(--dim);padding:24px;text-align:center;">No results for this filter.</div>`;
+  }
+}
+
+// ══════════════════════════════════════
+//  FILTER
+// ══════════════════════════════════════
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderList();
+}
+
+// ══════════════════════════════════════
+//  URL SHARE  (encode/decode via base64 in ?r= param)
+// ══════════════════════════════════════
+function encodeResults(data) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+
+function decodeResults(str) {
+  return JSON.parse(decodeURIComponent(escape(atob(str))));
+}
+
+function buildShareURL(data) {
+  const encoded = encodeResults(data);
+  return window.location.origin + window.location.pathname + '?r=' + encoded;
+}
+
+function showShareBar(url) {
+  const bar = document.getElementById('share-bar');
+  const urlEl = document.getElementById('share-url');
+  bar.style.display = 'flex';
+  urlEl.textContent = url;
+}
+
+function copyURL() {
+  const url = document.getElementById('share-url').textContent;
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy Link'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ══════════════════════════════════════
+//  LOAD FROM URL PARAM
+// ══════════════════════════════════════
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const r = params.get('r');
+  if (r) {
+    try {
+      const data = decodeResults(r);
+      renderResults(data);
+      showShareBar(window.location.href);
+      return true;
+    } catch(e) {
+      console.error('Failed to decode results:', e);
+    }
+  }
+  return false;
+}
+
+// ══════════════════════════════════════
+//  LOAD FROM PASTED JSON
+// ══════════════════════════════════════
+function loadPasted() {
+  const raw = document.getElementById('paste-box').value.trim();
+  try {
+    const data = JSON.parse(raw);
+    renderResults(data);
+    const url = buildShareURL(data);
+    showShareBar(url);
+    history.replaceState(null, '', '?r=' + encodeResults(data));
+  } catch(e) {
+    alert('Invalid JSON: ' + e.message);
+  }
+}
+
+// ══════════════════════════════════════
+//  DEMO DATA
+// ══════════════════════════════════════
+function loadDemo() {
+  const demo = {
+    executor: "Synapse X",
+    version: "2.1.0",
+    identity: 7,
+    date: new Date().toLocaleDateString(),
+    passes: 118,
+    fails: 14,
+    notest: 20,
+    aliasWarn: 3,
+    results: [
+      // Cache
+      {name:"cache.invalidate",   status:"pass",   category:"cache"},
+      {name:"cache.iscached",     status:"pass",   category:"cache"},
+      {name:"cache.replace",      status:"pass",   category:"cache"},
+      {name:"cloneref",           status:"pass",   category:"cache"},
+      {name:"compareinstances",   status:"pass",   category:"cache"},
+      // Closures
+      {name:"checkcaller",        status:"pass",   category:"closures"},
+      {name:"clonefunction",      status:"pass",   category:"closures"},
+      {name:"getcallingscript",   status:"notest", category:"closures"},
+      {name:"getscriptclosure",   status:"pass",   category:"closures"},
+      {name:"hookfunction",       status:"pass",   category:"closures"},
+      {name:"iscclosure",         status:"pass",   category:"closures"},
+      {name:"islclosure",         status:"pass",   category:"closures"},
+      {name:"isexecutorclosure",  status:"pass",   category:"closures"},
+      {name:"loadstring",         status:"pass",   category:"closures"},
+      {name:"newcclosure",        status:"pass",   category:"closures"},
+      // Crypt
+      {name:"crypt.base64encode", status:"pass",   category:"crypt"},
+      {name:"crypt.base64decode", status:"pass",   category:"crypt"},
+      {name:"crypt.encrypt",      status:"pass",   category:"crypt"},
+      {name:"crypt.decrypt",      status:"pass",   category:"crypt"},
+      {name:"crypt.generatebytes",status:"pass",   category:"crypt"},
+      {name:"crypt.generatekey",  status:"pass",   category:"crypt"},
+      {name:"crypt.hash",         status:"pass",   category:"crypt"},
+      {name:"crypt.hmac",         status:"fail",   category:"crypt",  message:"crypt.hmac not supported"},
+      {name:"crypt.random",       status:"pass",   category:"crypt"},
+      // Debug
+      {name:"debug.getconstant",  status:"pass",   category:"debug"},
+      {name:"debug.getconstants", status:"pass",   category:"debug"},
+      {name:"debug.getinfo",      status:"pass",   category:"debug"},
+      {name:"debug.getproto",     status:"pass",   category:"debug"},
+      {name:"debug.getprotos",    status:"pass",   category:"debug"},
+      {name:"debug.getstack",     status:"pass",   category:"debug"},
+      {name:"debug.getupvalue",   status:"pass",   category:"debug"},
+      {name:"debug.getupvalues",  status:"pass",   category:"debug"},
+      {name:"debug.setconstant",  status:"pass",   category:"debug"},
+      {name:"debug.setstack",     status:"pass",   category:"debug"},
+      {name:"debug.setupvalue",   status:"pass",   category:"debug"},
+      // Filesystem
+      {name:"readfile",           status:"pass",   category:"filesystem"},
+      {name:"writefile",          status:"pass",   category:"filesystem"},
+      {name:"appendfile",         status:"pass",   category:"filesystem"},
+      {name:"makefolder",         status:"pass",   category:"filesystem"},
+      {name:"listfiles",          status:"pass",   category:"filesystem"},
+      {name:"isfile",             status:"pass",   category:"filesystem"},
+      {name:"isfolder",           status:"pass",   category:"filesystem"},
+      {name:"delfolder",          status:"pass",   category:"filesystem"},
+      {name:"delfile",            status:"pass",   category:"filesystem"},
+      {name:"loadfile",           status:"pass",   category:"filesystem"},
+      {name:"dofile",             status:"notest", category:"filesystem"},
+      {name:"getcustomasset",     status:"pass",   category:"filesystem"},
+      // Instances
+      {name:"fireclickdetector",  status:"pass",   category:"instances"},
+      {name:"getcallbackvalue",   status:"pass",   category:"instances"},
+      {name:"getconnections",     status:"pass",   category:"instances"},
+      {name:"gethiddenproperty",  status:"pass",   category:"instances"},
+      {name:"sethiddenproperty",  status:"pass",   category:"instances"},
+      {name:"gethui",             status:"pass",   category:"instances"},
+      {name:"getinstances",       status:"pass",   category:"instances"},
+      {name:"getnilinstances",    status:"pass",   category:"instances"},
+      {name:"isscriptable",       status:"pass",   category:"instances"},
+      {name:"setscriptable",      status:"pass",   category:"instances"},
+      {name:"setrbxclipboard",    status:"notest", category:"instances"},
+      {name:"fireproximityprompt",status:"fail",   category:"instances", message:"ProximityPrompt not supported"},
+      {name:"firetouchinterest",  status:"pass",   category:"instances"},
+      // Metatable
+      {name:"getrawmetatable",    status:"pass",   category:"metatable"},
+      {name:"hookmetamethod",     status:"pass",   category:"metatable"},
+      {name:"getnamecallmethod",  status:"pass",   category:"metatable"},
+      {name:"isreadonly",         status:"pass",   category:"metatable"},
+      {name:"setrawmetatable",    status:"pass",   category:"metatable"},
+      {name:"setreadonly",        status:"pass",   category:"metatable"},
+      // Scripts
+      {name:"getgc",              status:"pass",   category:"scripts"},
+      {name:"getgenv",            status:"pass",   category:"scripts"},
+      {name:"getloadedmodules",   status:"pass",   category:"scripts"},
+      {name:"getrenv",            status:"pass",   category:"scripts"},
+      {name:"getrunningscripts",  status:"pass",   category:"scripts"},
+      {name:"getscriptbytecode",  status:"pass",   category:"scripts", message:"4821 bytes, header=0x04"},
+      {name:"getscripthash",      status:"pass",   category:"scripts"},
+      {name:"getscripts",         status:"pass",   category:"scripts"},
+      {name:"getsenv",            status:"pass",   category:"scripts"},
+      {name:"getthreadidentity",  status:"pass",   category:"scripts", message:"Identity: 7"},
+      {name:"setthreadidentity",  status:"pass",   category:"scripts"},
+      {name:"getscriptclosure",   status:"pass",   category:"scripts"},
+      {name:"require",            status:"pass",   category:"scripts"},
+      // Drawing
+      {name:"Drawing",            status:"pass",   category:"drawing"},
+      {name:"Drawing.new",        status:"pass",   category:"drawing"},
+      {name:"Drawing.Fonts",      status:"pass",   category:"drawing"},
+      {name:"isrenderobj",        status:"pass",   category:"drawing"},
+      {name:"getrenderproperty",  status:"pass",   category:"drawing"},
+      {name:"setrenderproperty",  status:"pass",   category:"drawing"},
+      {name:"cleardrawcache",     status:"pass",   category:"drawing"},
+      {name:"Drawing.Text",       status:"pass",   category:"drawing"},
+      {name:"Drawing.Image",      status:"pass",   category:"drawing"},
+      // WebSocket
+      {name:"WebSocket",          status:"pass",   category:"websocket"},
+      {name:"WebSocket.connect",  status:"pass",   category:"websocket", message:"echo confirmed"},
+      {name:"WebSocket.wss",      status:"fail",   category:"websocket", message:"WSS timed out after 5s"},
+      // Actors
+      {name:"getactors",          status:"fail",   category:"actors",    message:"global not found"},
+      {name:"run_on_actor",       status:"fail",   category:"actors",    message:"global not found"},
+      {name:"Actor.SendMessage",  status:"pass",   category:"actors"},
+      {name:"Actor.BindToMessage",status:"pass",   category:"actors"},
+      {name:"SharedTable",        status:"fail",   category:"actors",    message:"SharedTable not supported"},
+      // Misc
+      {name:"identifyexecutor",   status:"pass",   category:"misc",      message:"Executor: Synapse X 2.1.0"},
+      {name:"lz4compress",        status:"pass",   category:"misc"},
+      {name:"lz4decompress",      status:"pass",   category:"misc"},
+      {name:"request",            status:"pass",   category:"misc"},
+      {name:"setfpscap",          status:"pass",   category:"misc",      message:"~30fps at cap 30"},
+      // Signal
+      {name:"getconnections_deep",status:"pass",   category:"signal"},
+      {name:"connection.Disable_Enable",status:"pass",category:"signal"},
+      {name:"connection.Fire",    status:"pass",   category:"signal"},
+      {name:"connection.Function",status:"pass",   category:"signal"},
+      {name:"connection.Thread",  status:"pass",   category:"signal"},
+    ]
+  };
+  renderResults(demo);
+  const url = buildShareURL(demo);
+  showShareBar(url);
+  history.replaceState(null, '', '?r=' + encodeResults(demo));
+}
+
+// ══════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function animCount(el, from, to, duration, fmt) {
+  const start = performance.now();
+  fmt = fmt || (v => v);
+  function step(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = fmt(Math.round(from + (to - from) * ease));
+    if (t < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+window.addEventListener('load', () => {
+  if (!loadFromURL()) {
+    document.getElementById('empty-view').style.display = 'block';
+  }
+});
+
+// ── Expose global for Lua to call via synapse/http ──────────
+// The Lua script will POST JSON to a local endpoint OR encode results
+// into the URL directly (recommended approach since no server needed).
+// This function can also be called programmatically:
+window.IFertLoad = function(data) {
+  renderResults(data);
+  const url = buildShareURL(data);
+  showShareBar(url);
+  history.replaceState(null, '', '?r=' + encodeResults(data));
+};
+</script>
+</body>
+</html>
