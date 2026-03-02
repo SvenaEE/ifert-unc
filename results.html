@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IFert — Results</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0b0f;
+    --bg2:      #0f1117;
+    --bg3:      #151820;
+    --surface:  #1a1e2a;
+    --surface2: #1f2435;
+    --border:   #252b3d;
+    --border2:  #2e364d;
+    --text:     #e8eaf0;
+    --muted:    #7a8099;
+    --dim:      #4a5068;
+    --accent:   #5b7cff;
+    --accent2:  #7c9aff;
+    --green:    #3ddc97;
+    --green2:   #2ab87e;
+    --red:      #ff5f5f;
+    --red2:     #cc4040;
+    --yellow:   #ffc14a;
+    --mono:     'JetBrains Mono', monospace;
+    --sans:     'Space Grotesk', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(91,124,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,124,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+
+  .wrap {
+    position: relative; z-index: 1;
+    max-width: 900px; margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 44px 0 36px;
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+
+  .logo {
+    font-family: var(--mono);
+    font-size: 13px; color: var(--muted);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .logo span { color: var(--accent2); font-weight: 700; }
+
+  .back-btn {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 6px;
+    cursor: pointer; letter-spacing: 0.08em;
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .back-btn:hover { border-color: var(--border2); color: var(--text); }
+
+  /* ── EXECUTOR CARD ── */
+  .executor-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    position: relative; overflow: hidden;
+  }
+
+  .executor-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent) 40%, var(--accent2) 60%, transparent);
+    opacity: 0.6;
+  }
+
+  .executor-glow {
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(91,124,255,0.08), transparent 70%);
+    pointer-events: none;
+  }
+
+  .exec-label {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .exec-name-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .exec-name {
+    font-family: var(--mono);
+    font-size: 26px; font-weight: 700;
+    color: var(--accent2);
+    letter-spacing: -0.02em; line-height: 1;
+  }
+
+  .grade-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 8px;
+    font-family: var(--mono); font-size: 18px; font-weight: 700;
+  }
+
+  .exec-meta {
+    display: flex; gap: 24px; flex-wrap: wrap;
+  }
+
+  .exec-meta-item { display: flex; flex-direction: column; gap: 2px; }
+
+  .exec-meta-label {
+    font-family: var(--mono);
+    font-size: 9px; color: var(--dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+
+  .exec-meta-value {
+    font-family: var(--mono);
+    font-size: 13px; color: var(--muted);
+  }
+
+  /* ── SCORE RING + STATS ── */
+  .score-section {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px; align-items: center;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 560px) {
+    .score-section { grid-template-columns: 1fr; }
+    .ring-wrap { justify-self: center; }
+  }
+
+  .ring-wrap {
+    position: relative; width: 160px; height: 160px; flex-shrink: 0;
+  }
+
+  .ring-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 10; }
+  .ring-fg {
+    fill: none; stroke-width: 10; stroke-linecap: round;
+    stroke-dasharray: 408; stroke-dashoffset: 408;
+    transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .ring-center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+
+  .ring-pct {
+    font-family: var(--mono);
+    font-size: 34px; font-weight: 700;
+    color: var(--text); line-height: 1;
+  }
+
+  .ring-sub {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+
+  .stat-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px;
+    position: relative; overflow: hidden;
+  }
+
+  .stat-box::after {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 0 2px 2px 0;
+  }
+
+  .stat-box.pass::after   { background: var(--green);  }
+  .stat-box.fail::after   { background: var(--red);    }
+  .stat-box.notest::after { background: var(--dim);    }
+  .stat-box.alias::after  { background: var(--yellow); }
+
+  .stat-num {
+    font-family: var(--mono);
+    font-size: 28px; font-weight: 700; line-height: 1;
+  }
+
+  .stat-box.pass .stat-num   { color: var(--green);  }
+  .stat-box.fail .stat-num   { color: var(--red);    }
+  .stat-box.notest .stat-num { color: var(--muted);  }
+  .stat-box.alias .stat-num  { color: var(--yellow); }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-bar-wrap {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+
+  .progress-bar-label {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .progress-track {
+    height: 8px; background: var(--bg3);
+    border-radius: 99px; overflow: hidden; display: flex;
+  }
+
+  .progress-pass {
+    height: 100%; background: var(--green);
+    border-radius: 99px 0 0 99px;
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1); width: 0;
+  }
+  .progress-fail {
+    height: 100%; background: var(--red);
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.1s; width: 0;
+  }
+  .progress-notest {
+    height: 100%; background: var(--surface2);
+    border-radius: 0 99px 99px 0;
+    transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.2s; width: 0;
+  }
+
+  .progress-legend {
+    display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap;
+  }
+
+  .leg-item {
+    display: flex; align-items: center; gap: 5px;
+    font-family: var(--mono); font-size: 10px; color: var(--muted);
+  }
+
+  .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ── FILTER ── */
+  .filter-row {
+    display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    font-family: var(--mono); font-size: 10px;
+    padding: 5px 12px; border-radius: 99px;
+    border: 1px solid var(--border);
+    background: var(--surface); color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+    letter-spacing: 0.05em;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent2); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-family: var(--mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 12px;
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ── RESULTS LIST ── */
+  .results-list {
+    display: flex; flex-direction: column;
+    gap: 2px; margin-bottom: 24px;
+  }
+
+  .cat-header {
+    font-family: var(--mono);
+    font-size: 10px; font-weight: 600;
+    color: var(--accent2);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 14px 0 5px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .cat-header::before { content: '▸'; font-size: 9px; }
+  .cat-line { flex: 1; height: 1px; background: var(--border); }
+
+  .result-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: 7px;
+    border: 1px solid transparent;
+    font-family: var(--mono); font-size: 12px;
+    transition: background 0.12s, border-color 0.12s;
+    cursor: default;
+    animation: fadeIn 0.25s ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-row:hover { background: var(--surface); border-color: var(--border); }
+
+  .result-icon {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; flex-shrink: 0;
+  }
+
+  .result-icon.pass   { background: rgba(61,220,151,0.14); color: var(--green);  }
+  .result-icon.fail   { background: rgba(255,95,95,0.14);  color: var(--red);    }
+  .result-icon.notest { background: rgba(74,80,104,0.18);  color: var(--dim);    }
+  .result-icon.alias  { background: rgba(255,193,74,0.14); color: var(--yellow); }
+
+  .result-name { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .result-row.fail .result-name   { color: var(--red);   }
+  .result-row.notest .result-name { color: var(--muted); }
+
+  .result-msg {
+    font-size: 10px; color: var(--dim);
+    flex: 1.5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .result-row.fail .result-msg { color: rgba(255,95,95,0.65); }
+
+  /* ── TIMESTAMP ── */
+  .timestamp {
+    font-family: var(--mono); font-size: 10px;
+    color: var(--dim); text-align: center;
+    margin-top: 16px; letter-spacing: 0.06em;
+  }
+
+  /* ── NO DATA ── */
+  .no-data {
+    text-align: center; padding: 80px 24px;
+  }
+
+  .no-data-icon {
+    font-family: var(--mono); font-size: 48px;
+    color: var(--dim); margin-bottom: 16px; display: block;
+  }
+
+  .no-data-title {
+    font-family: var(--mono); font-size: 16px;
+    color: var(--muted); margin-bottom: 8px; font-weight: 600;
+  }
+
+  .no-data-sub {
+    font-family: var(--mono); font-size: 12px;
+    color: var(--dim); line-height: 1.75;
+  }
+
+  .go-back-btn {
+    display: inline-block; margin-top: 24px;
+    font-family: var(--mono); font-size: 11px;
+    padding: 10px 22px; background: var(--accent);
+    color: #fff; border: none; border-radius: 8px;
+    cursor: pointer; letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .go-back-btn:hover { background: var(--accent2); }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- NO DATA STATE -->
+  <div id="no-data-view" style="display:none">
+    <div class="no-data">
+      <span class="no-data-icon">⬡</span>
+      <div class="no-data-title">No results found</div>
+      <div class="no-data-sub">
+        Looks like you navigated here directly.<br>
+        Go back and paste your IFert JSON first.
+      </div>
+      <a class="go-back-btn" href="index.html">← Back to IFert</a>
+    </div>
+  </div>
+
+  <!-- RESULTS VIEW -->
+  <div id="results-view" style="display:none">
+
+    <header>
+      <div>
+        <div class="logo"><span>I</span>FERT — UNC Checker</div>
+        <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:0.05em;">
+          Universal Naming Convention Results
+        </div>
+      </div>
+      <a class="back-btn" href="index.html">← New Test</a>
+    </header>
+
+    <!-- Executor card -->
+    <div class="executor-card">
+      <div class="executor-glow"></div>
+      <div class="exec-label">Executor Identified</div>
+      <div class="exec-name-row">
+        <div class="exec-name" id="exec-name">—</div>
+        <div class="grade-badge" id="grade-badge"></div>
+      </div>
+      <div class="exec-meta">
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Version</span>
+          <span class="exec-meta-value" id="exec-version">—</span>
+        </div>
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Thread Identity</span>
+          <span class="exec-meta-value" id="exec-identity">—</span>
+        </div>
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Total Tests</span>
+          <span class="exec-meta-value" id="exec-total">—</span>
+        </div>
+        <div class="exec-meta-item">
+          <span class="exec-meta-label">Tested On</span>
+          <span class="exec-meta-value" id="exec-date">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score ring + stats -->
+    <div class="score-section">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 146 146">
+          <circle class="ring-bg" cx="73" cy="73" r="65"/>
+          <circle class="ring-fg" id="ring-fg" cx="73" cy="73" r="65"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-sub">pass rate</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box pass">
+          <div class="stat-num" id="stat-pass">0</div>
+          <div class="stat-label">✅ Passed</div>
+        </div>
+        <div class="stat-box fail">
+          <div class="stat-num" id="stat-fail">0</div>
+          <div class="stat-label">⛔ Failed</div>
+        </div>
+        <div class="stat-box notest">
+          <div class="stat-num" id="stat-notest">0</div>
+          <div class="stat-label">⏺ No Test</div>
+        </div>
+        <div class="stat-box alias">
+          <div class="stat-num" id="stat-alias">0</div>
+          <div class="stat-label">⚠ Alias Warn</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">Result breakdown</div>
+      <div class="progress-track">
+        <div class="progress-pass"   id="prog-pass"></div>
+        <div class="progress-fail"   id="prog-fail"></div>
+        <div class="progress-notest" id="prog-notest"></div>
+      </div>
+      <div class="progress-legend">
+        <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Passed</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Failed</div>
+        <div class="leg-item"><div class="leg-dot" style="background:var(--surface2)"></div>No Test</div>
+      </div>
+    </div>
+
+    <!-- Filter + list -->
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('pass',this)">Passed</button>
+      <button class="filter-btn" onclick="setFilter('fail',this)">Failed</button>
+      <button class="filter-btn" onclick="setFilter('notest',this)">No Test</button>
+    </div>
+
+    <div class="section-title">Test Results</div>
+    <div class="results-list" id="results-list"></div>
+
+    <div class="timestamp" id="timestamp"></div>
+  </div>
+
+</div>
+
+<script>
+  let allRows = [];
+  let currentFilter = 'all';
+
+  // ── Helpers ──────────────────────────────────
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;');
+  }
+
+  function animCount(el, to, duration, fmt) {
+    const start = performance.now();
+    fmt = fmt || (v => v);
+    function step(now) {
+      const t = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      el.textContent = fmt(Math.round(to * ease));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function getGrade(pct) {
+    if (pct >= 95) return { letter:'S', color:'#ffc14a', bg:'rgba(255,193,74,0.15)' };
+    if (pct >= 85) return { letter:'A', color:'#3ddc97', bg:'rgba(61,220,151,0.12)' };
+    if (pct >= 70) return { letter:'B', color:'#5b7cff', bg:'rgba(91,124,255,0.15)' };
+    if (pct >= 55) return { letter:'C', color:'#ff9f5f', bg:'rgba(255,159,95,0.15)' };
+    if (pct >= 40) return { letter:'D', color:'#ff6b6b', bg:'rgba(255,107,107,0.15)' };
+    return { letter:'F', color:'#ff5f5f', bg:'rgba(255,95,95,0.18)' };
+  }
+
+  function ringColor(pct) {
+    if (pct >= 85) return '#3ddc97';
+    if (pct >= 70) return '#5b7cff';
+    if (pct >= 50) return '#ffc14a';
+    return '#ff5f5f';
+  }
+
+  // ── Render ───────────────────────────────────
+  function renderResults(data) {
+    document.getElementById('no-data-view').style.display  = 'none';
+    document.getElementById('results-view').style.display  = 'block';
+
+    const passes  = data.passes    || 0;
+    const fails   = data.fails     || 0;
+    const notest  = data.notest    || 0;
+    const aliases = data.aliasWarn || 0;
+    const total   = passes + fails + notest;
+    const tested  = passes + fails;
+    const pct     = tested > 0 ? Math.round(passes / tested * 100) : 0;
+
+    // Executor card
+    document.getElementById('exec-name').textContent    = data.executor || 'Unknown';
+    document.getElementById('exec-version').textContent = data.version  || '—';
+    document.getElementById('exec-identity').textContent =
+      data.identity != null ? 'Level ' + data.identity : '—';
+    document.getElementById('exec-total').textContent   = total + ' tests';
+    document.getElementById('exec-date').textContent    = data.date || new Date().toLocaleDateString();
+
+    // Grade badge
+    const grade = getGrade(pct);
+    const badge = document.getElementById('grade-badge');
+    badge.textContent        = grade.letter;
+    badge.style.color        = grade.color;
+    badge.style.background   = grade.bg;
+
+    // Counters (animated)
+    animCount(document.getElementById('stat-pass'),   passes,  900, v => v);
+    animCount(document.getElementById('stat-fail'),   fails,   900, v => v);
+    animCount(document.getElementById('stat-notest'), notest,  900, v => v);
+    animCount(document.getElementById('stat-alias'),  aliases, 900, v => v);
+
+    // Ring
+    setTimeout(() => {
+      const ring   = document.getElementById('ring-fg');
+      const circ   = 408;
+      ring.style.strokeDashoffset = circ - (circ * pct / 100);
+      ring.style.stroke           = ringColor(pct);
+      animCount(document.getElementById('ring-pct'), pct, 1400, v => v + '%');
+    }, 80);
+
+    // Progress bars
+    setTimeout(() => {
+      document.getElementById('prog-pass').style.width   = (total ? passes / total * 100 : 0) + '%';
+      document.getElementById('prog-fail').style.width   = (total ? fails  / total * 100 : 0) + '%';
+      document.getElementById('prog-notest').style.width = (total ? notest / total * 100 : 0) + '%';
+    }, 80);
+
+    document.getElementById('timestamp').textContent =
+      'Generated ' + new Date().toLocaleString();
+
+    allRows = data.results || [];
+    renderList();
+  }
+
+  function renderList() {
+    const list     = document.getElementById('results-list');
+    list.innerHTML = '';
+
+    const filtered = currentFilter === 'all'
+      ? allRows
+      : allRows.filter(r => r.status === currentFilter);
+
+    // Group by category preserving order
+    const catOrder = [];
+    const cats     = {};
+    for (const r of filtered) {
+      const cat = r.category || 'misc';
+      if (!cats[cat]) { cats[cat] = []; catOrder.push(cat); }
+      cats[cat].push(r);
+    }
+
+    let delay = 0;
+    for (const cat of catOrder) {
+      // Category header
+      const hdr        = document.createElement('div');
+      hdr.className    = 'cat-header';
+      hdr.innerHTML    = esc(cat.toUpperCase()) + '<div class="cat-line"></div>';
+      list.appendChild(hdr);
+
+      for (const r of cats[cat]) {
+        const row       = document.createElement('div');
+        row.className   = 'result-row ' + (r.status || 'notest');
+        row.style.animationDelay = delay + 's';
+        delay = Math.min(delay + 0.018, 0.45);
+
+        const iconMap = { pass:'✓', fail:'✗', notest:'○', alias:'⚠' };
+        const icon    = iconMap[r.status] || '?';
+        const msg     = r.message
+          ? `<span class="result-msg">${esc(r.message)}</span>`
+          : '';
+
+        row.innerHTML = `
+          <div class="result-icon ${r.status || 'notest'}">${icon}</div>
+          <span class="result-name">${esc(r.name)}</span>
+          ${msg}
+        `;
+        list.appendChild(row);
+      }
+    }
+
+    if (list.children.length === 0) {
+      list.innerHTML = `<div style="font-family:var(--mono);font-size:12px;color:var(--dim);padding:24px;text-align:center;">No results for this filter.</div>`;
+    }
+  }
+
+  function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  }
+
+  // ── Init ─────────────────────────────────────
+  window.addEventListener('load', () => {
+    const raw = sessionStorage.getItem('ifert_results');
+    if (!raw) {
+      document.getElementById('no-data-view').style.display = 'block';
+      return;
+    }
+    try {
+      const data = JSON.parse(raw);
+      renderResults(data);
+    } catch(e) {
+      document.getElementById('no-data-view').style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
