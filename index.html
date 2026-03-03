@@ -29,638 +29,97 @@
     --mono:     'JetBrains Mono', monospace;
     --sans:     'Space Grotesk', sans-serif;
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(91,124,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(91,124,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
-
-  .wrap {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  header {
-    padding: 52px 0 40px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .logo {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .logo span {
-    color: var(--accent2);
-    font-weight: 700;
-  }
-
-  .header-tag {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--dim);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    border-radius: 4px;
-    letter-spacing: 0.08em;
-  }
-
-  /* ── EXECUTOR CARD ── */
-  .executor-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px 32px;
-    margin-bottom: 28px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .executor-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--accent) 40%, var(--accent2) 60%, transparent);
-    opacity: 0.6;
-  }
-
-  .executor-glow {
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(91,124,255,0.08), transparent 70%);
-    pointer-events: none;
-  }
-
-  .exec-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  .exec-name {
-    font-family: var(--mono);
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--accent2);
-    letter-spacing: -0.02em;
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .exec-meta {
-    display: flex;
-    gap: 20px;
-    margin-top: 16px;
-    flex-wrap: wrap;
-  }
-
-  .exec-meta-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .exec-meta-label {
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--dim);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .exec-meta-value {
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .score-section {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 28px;
-    align-items: center;
-    margin-bottom: 28px;
-  }
-
-  @media (max-width: 600px) {
-    .score-section { grid-template-columns: 1fr; }
-    .ring-wrap { justify-self: center; }
-  }
-
-  .ring-wrap {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    flex-shrink: 0;
-  }
-
-  .ring-wrap svg {
-    transform: rotate(-90deg);
-    width: 100%;
-    height: 100%;
-  }
-
-  .ring-bg {
-    fill: none;
-    stroke: var(--surface2);
-    stroke-width: 10;
-  }
-
-  .ring-fg {
-    fill: none;
-    stroke-width: 10;
-    stroke-linecap: round;
-    stroke-dasharray: 408;
-    stroke-dashoffset: 408;
-    transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  .ring-center {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0;
-  }
-
-  .ring-pct {
-    font-family: var(--mono);
-    font-size: 34px;
-    font-weight: 700;
-    line-height: 1;
-    color: var(--text);
-  }
-
-  .ring-sub {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-top: 2px;
-  }
-
-  .stat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  .stat-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-box::after {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    border-radius: 0 2px 2px 0;
-  }
-
-  .stat-box.pass::after  { background: var(--green);  }
-  .stat-box.fail::after  { background: var(--red);    }
-  .stat-box.notest::after{ background: var(--dim);    }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(91,124,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(91,124,255,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.4; }
+  .wrap { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+  header { padding: 52px 0 40px; display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .logo { font-family: var(--mono); font-size: 13px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+  .logo span { color: var(--accent2); font-weight: 700; }
+  .header-tag { font-family: var(--mono); font-size: 11px; color: var(--dim); background: var(--surface); border: 1px solid var(--border); padding: 4px 10px; border-radius: 4px; letter-spacing: 0.08em; }
+  .executor-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; margin-bottom: 28px; position: relative; overflow: hidden; }
+  .executor-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent) 40%, var(--accent2) 60%, transparent); opacity: 0.6; }
+  .executor-glow { position: absolute; top: -40px; right: -40px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(91,124,255,0.08), transparent 70%); pointer-events: none; }
+  .exec-label { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 6px; }
+  .exec-name { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--accent2); letter-spacing: -0.02em; line-height: 1; margin-bottom: 4px; }
+  .exec-meta { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+  .exec-meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .exec-meta-label { font-family: var(--mono); font-size: 9px; color: var(--dim); letter-spacing: 0.12em; text-transform: uppercase; }
+  .exec-meta-value { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .score-section { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; margin-bottom: 28px; }
+  @media (max-width: 600px) { .score-section { grid-template-columns: 1fr; } .ring-wrap { justify-self: center; } }
+  .ring-wrap { position: relative; width: 160px; height: 160px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+  .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 10; }
+  .ring-fg { fill: none; stroke-width: 10; stroke-linecap: round; stroke-dasharray: 408; stroke-dashoffset: 408; transition: stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1); }
+  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; }
+  .ring-pct { font-family: var(--mono); font-size: 34px; font-weight: 700; line-height: 1; color: var(--text); }
+  .ring-sub { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .stat-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; position: relative; overflow: hidden; }
+  .stat-box::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; border-radius: 0 2px 2px 0; }
+  .stat-box.pass::after  { background: var(--green); }
+  .stat-box.fail::after  { background: var(--red); }
+  .stat-box.notest::after{ background: var(--dim); }
   .stat-box.alias::after { background: var(--yellow); }
-
-  .stat-num {
-    font-family: var(--mono);
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-  }
-
-  .stat-box.pass .stat-num  { color: var(--green);  }
-  .stat-box.fail .stat-num  { color: var(--red);    }
-  .stat-box.notest .stat-num{ color: var(--muted);  }
-  .stat-box.alias .stat-num { color: var(--yellow); }
-
-  .stat-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-
- 
-  .progress-bar-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
-    margin-bottom: 28px;
-  }
-
-  .progress-bar-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .progress-track {
-    height: 8px;
-    background: var(--bg3);
-    border-radius: 99px;
-    overflow: hidden;
-    display: flex;
-  }
-
-  .progress-pass {
-    height: 100%;
-    background: var(--green);
-    border-radius: 99px 0 0 99px;
-    transition: width 1.4s cubic-bezier(0.4,0,0.2,1);
-    width: 0;
-  }
-
-  .progress-fail {
-    height: 100%;
-    background: var(--red);
-    transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.1s;
-    width: 0;
-  }
-
-  .progress-notest {
-    height: 100%;
-    background: var(--surface2);
-    border-radius: 0 99px 99px 0;
-    transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.2s;
-    width: 0;
-  }
-
-  .progress-legend {
-    display: flex;
-    gap: 16px;
-    margin-top: 8px;
-    flex-wrap: wrap;
-  }
-
-  .leg-item {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--muted);
-  }
-
-  .leg-dot {
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  /* ── RESULTS LIST ── */
-  .section-title {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .section-title::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .results-list {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    margin-bottom: 28px;
-  }
-
-  .result-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 14px;
-    border-radius: 7px;
-    border: 1px solid transparent;
-    font-family: var(--mono);
-    font-size: 12px;
-    transition: background 0.15s, border-color 0.15s;
-    cursor: default;
-    animation: fadeIn 0.3s ease both;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .result-row:hover {
-    background: var(--surface);
-    border-color: var(--border);
-  }
-
-  .result-row.pass  { }
-  .result-row.fail  { }
-  .result-row.notest{ }
-
-  .result-icon {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    flex-shrink: 0;
-  }
-
-  .result-icon.pass  { background: rgba(61,220,151,0.15); color: var(--green); }
-  .result-icon.fail  { background: rgba(255,95,95,0.15);  color: var(--red);   }
-  .result-icon.notest{ background: rgba(74,80,104,0.2);   color: var(--dim);   }
-  .result-icon.alias { background: rgba(255,193,74,0.15); color: var(--yellow);}
-
-  .result-name {
-    flex: 1;
-    color: var(--text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .result-row.fail .result-name  { color: var(--red);    }
-  .result-row.notest .result-name{ color: var(--muted);  }
-
-  .result-msg {
-    font-size: 10px;
-    color: var(--dim);
-    flex: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .result-cat {
-    font-size: 9px;
-    color: var(--dim);
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    padding: 2px 7px;
-    border-radius: 4px;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-  }
-
-  /* category header */
-  .cat-header {
-    font-family: var(--mono);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--accent2);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 14px 0 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .cat-header::before {
-    content: '▸';
-    font-size: 9px;
-  }
-
-  .cat-header-line {
-    flex: 1; height: 1px;
-    background: var(--border);
-  }
-
-  /* ── FILTERS ── */
-  .filter-row {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 14px;
-    flex-wrap: wrap;
-  }
-
-  .filter-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 5px 12px;
-    border-radius: 99px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--muted);
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.05em;
-  }
-
+  .stat-num { font-family: var(--mono); font-size: 28px; font-weight: 700; line-height: 1; }
+  .stat-box.pass .stat-num   { color: var(--green); }
+  .stat-box.fail .stat-num   { color: var(--red); }
+  .stat-box.notest .stat-num { color: var(--muted); }
+  .stat-box.alias .stat-num  { color: var(--yellow); }
+  .stat-label { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 4px; }
+  .progress-bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; margin-bottom: 28px; }
+  .progress-bar-label { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 10px; }
+  .progress-track { height: 8px; background: var(--bg3); border-radius: 99px; overflow: hidden; display: flex; }
+  .progress-pass   { height: 100%; background: var(--green);   border-radius: 99px 0 0 99px; transition: width 1.4s cubic-bezier(0.4,0,0.2,1); width: 0; }
+  .progress-fail   { height: 100%; background: var(--red);     transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.1s; width: 0; }
+  .progress-notest { height: 100%; background: var(--surface2); border-radius: 0 99px 99px 0; transition: width 1.4s cubic-bezier(0.4,0,0.2,1) 0.2s; width: 0; }
+  .progress-legend { display: flex; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .section-title { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .results-list { display: flex; flex-direction: column; gap: 3px; margin-bottom: 28px; }
+  .result-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-radius: 7px; border: 1px solid transparent; font-family: var(--mono); font-size: 12px; transition: background 0.15s, border-color 0.15s; cursor: default; animation: fadeIn 0.3s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .result-row:hover { background: var(--surface); border-color: var(--border); }
+  .result-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
+  .result-icon.pass   { background: rgba(61,220,151,0.15); color: var(--green); }
+  .result-icon.fail   { background: rgba(255,95,95,0.15);  color: var(--red); }
+  .result-icon.notest { background: rgba(74,80,104,0.2);   color: var(--dim); }
+  .result-icon.alias  { background: rgba(255,193,74,0.15); color: var(--yellow); }
+  .result-name { flex: 1; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .result-row.fail .result-name   { color: var(--red); }
+  .result-row.notest .result-name { color: var(--muted); }
+  .result-msg { font-size: 10px; color: var(--dim); flex: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-header { font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--accent2); letter-spacing: 0.12em; text-transform: uppercase; padding: 14px 0 4px; display: flex; align-items: center; gap: 8px; }
+  .cat-header::before { content: '\25B8'; font-size: 9px; }
+  .cat-header-line { flex: 1; height: 1px; background: var(--border); }
+  .filter-row { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-btn { font-family: var(--mono); font-size: 10px; padding: 5px 12px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all 0.15s; letter-spacing: 0.05em; }
   .filter-btn:hover { border-color: var(--accent); color: var(--accent2); }
   .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-  .share-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-  }
-
-  .share-label {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .share-url {
-    flex: 1;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--accent2);
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 7px 12px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    cursor: text;
-    user-select: all;
-  }
-
-  .copy-btn {
-    font-family: var(--mono);
-    font-size: 10px;
-    padding: 7px 14px;
-    background: var(--accent);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: background 0.15s;
-    white-space: nowrap;
-  }
-
+  .share-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+  .share-label { font-family: var(--mono); font-size: 10px; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; }
+  .share-url { flex: 1; font-family: var(--mono); font-size: 11px; color: var(--accent2); background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: text; user-select: all; }
+  .copy-btn { font-family: var(--mono); font-size: 10px; padding: 7px 14px; background: var(--accent); color: #fff; border: none; border-radius: 6px; cursor: pointer; letter-spacing: 0.05em; transition: background 0.15s; white-space: nowrap; }
   .copy-btn:hover { background: var(--accent2); }
   .copy-btn.copied { background: var(--green2); }
-
-  .empty-state {
-    text-align: center;
-    padding: 80px 24px;
-  }
-
-  .empty-icon {
-    font-family: var(--mono);
-    font-size: 48px;
-    color: var(--dim);
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .empty-title {
-    font-family: var(--mono);
-    font-size: 16px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-
-  .empty-sub {
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--dim);
-    line-height: 1.7;
-  }
-
-  .empty-sub code {
-    color: var(--accent2);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 1px 6px;
-    border-radius: 4px;
-  }
-
-  /* ── TIMESTAMP ── */
-  .timestamp {
-    font-family: var(--mono);
-    font-size: 10px;
-    color: var(--dim);
-    text-align: center;
-    margin-top: 16px;
-    letter-spacing: 0.06em;
-  }
-
-  /* ── GRADE BADGE ── */
-  .grade-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    font-family: var(--mono);
-    font-size: 18px;
-    font-weight: 700;
-    margin-left: 12px;
-  }
-
+  .empty-state { text-align: center; padding: 80px 24px; }
+  .empty-icon { font-family: var(--mono); font-size: 48px; color: var(--dim); margin-bottom: 16px; display: block; }
+  .empty-title { font-family: var(--mono); font-size: 16px; color: var(--muted); margin-bottom: 8px; font-weight: 600; }
+  .empty-sub { font-family: var(--mono); font-size: 12px; color: var(--dim); line-height: 1.7; }
+  .empty-sub code { color: var(--accent2); background: var(--surface); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; }
+  .timestamp { font-family: var(--mono); font-size: 10px; color: var(--dim); text-align: center; margin-top: 16px; letter-spacing: 0.06em; }
+  .grade-badge { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; font-family: var(--mono); font-size: 18px; font-weight: 700; margin-left: 12px; }
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
-
-  .demo-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-family: var(--mono);
-    font-size: 9px;
-    color: var(--yellow);
-    background: rgba(255,193,74,0.1);
-    border: 1px solid rgba(255,193,74,0.25);
-    padding: 3px 8px;
-    border-radius: 4px;
-    letter-spacing: 0.08em;
-  }
-
-  .pulse {
-    width: 5px; height: 5px;
-    background: var(--yellow);
-    border-radius: 50%;
-    animation: pulse 1.5s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.7); }
-  }
-
+  .demo-tag { display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9px; color: var(--yellow); background: rgba(255,193,74,0.1); border: 1px solid rgba(255,193,74,0.25); padding: 3px 8px; border-radius: 4px; letter-spacing: 0.08em; }
+  .pulse { width: 5px; height: 5px; background: var(--yellow); border-radius: 50%; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
   .results-list .result-row:nth-child(1)  { animation-delay: 0.00s; }
   .results-list .result-row:nth-child(2)  { animation-delay: 0.03s; }
   .results-list .result-row:nth-child(3)  { animation-delay: 0.06s; }
@@ -675,23 +134,23 @@
 </head>
 <body>
 <div class="wrap">
-
   <header>
     <div>
       <div class="logo"><span>I</span>FERT — UNC Checker</div>
-      <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:0.05em;">
-        Universal Naming Convention Results Dashboard
-      </div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px;letter-spacing:0.05em;">Universal Naming Convention Results Dashboard</div>
     </div>
     <div class="header-tag">v3.1</div>
   </header>
+
   <div id="results-view" style="display:none">
+    <div id="back-btn-wrap" style="margin-bottom:16px;display:none">
+      <button onclick="showLanding()" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--dim)'" style="background:none;border:1px solid var(--border);color:var(--dim);font-family:var(--mono);font-size:11px;padding:7px 16px;border-radius:6px;cursor:pointer;letter-spacing:0.04em;transition:all 0.15s">&#8592; Back to Import</button>
+    </div>
     <div class="share-bar" id="share-bar" style="display:none">
       <span class="share-label">Share</span>
       <span class="share-url" id="share-url"></span>
       <button class="copy-btn" id="copy-btn" onclick="copyURL()">Copy Link</button>
     </div>
-
     <div class="executor-card">
       <div class="executor-glow"></div>
       <div class="exec-label">Executor Identified</div>
@@ -700,26 +159,12 @@
         <div class="grade-badge" id="grade-badge"></div>
       </div>
       <div class="exec-meta">
-        <div class="exec-meta-item">
-          <span class="exec-meta-label">Version</span>
-          <span class="exec-meta-value" id="exec-version">—</span>
-        </div>
-        <div class="exec-meta-item">
-          <span class="exec-meta-label">Thread Identity</span>
-          <span class="exec-meta-value" id="exec-identity">—</span>
-        </div>
-        <div class="exec-meta-item">
-          <span class="exec-meta-label">Total Tests</span>
-          <span class="exec-meta-value" id="exec-total">—</span>
-        </div>
-        <div class="exec-meta-item">
-          <span class="exec-meta-label">Tested On</span>
-          <span class="exec-meta-value" id="exec-date">—</span>
-        </div>
+        <div class="exec-meta-item"><span class="exec-meta-label">Version</span><span class="exec-meta-value" id="exec-version">—</span></div>
+        <div class="exec-meta-item"><span class="exec-meta-label">Thread Identity</span><span class="exec-meta-value" id="exec-identity">—</span></div>
+        <div class="exec-meta-item"><span class="exec-meta-label">Total Tests</span><span class="exec-meta-value" id="exec-total">—</span></div>
+        <div class="exec-meta-item"><span class="exec-meta-label">Tested On</span><span class="exec-meta-value" id="exec-date">—</span></div>
       </div>
     </div>
-
-    <!-- Score + stats -->
     <div class="score-section">
       <div class="ring-wrap">
         <svg viewBox="0 0 146 146">
@@ -731,34 +176,19 @@
           <div class="ring-sub">pass rate</div>
         </div>
       </div>
-
       <div class="stat-grid">
-        <div class="stat-box pass">
-          <div class="stat-num" id="stat-pass">0</div>
-          <div class="stat-label">✅ Passed</div>
-        </div>
-        <div class="stat-box fail">
-          <div class="stat-num" id="stat-fail">0</div>
-          <div class="stat-label">⛔ Failed</div>
-        </div>
-        <div class="stat-box notest">
-          <div class="stat-num" id="stat-notest">0</div>
-          <div class="stat-label">⏺ No Test</div>
-        </div>
-        <div class="stat-box alias">
-          <div class="stat-num" id="stat-alias">0</div>
-          <div class="stat-label">⚠ Alias Warn</div>
-        </div>
+        <div class="stat-box pass"><div class="stat-num" id="stat-pass">0</div><div class="stat-label">✅ Passed</div></div>
+        <div class="stat-box fail"><div class="stat-num" id="stat-fail">0</div><div class="stat-label">⛔ Failed</div></div>
+        <div class="stat-box notest"><div class="stat-num" id="stat-notest">0</div><div class="stat-label">⏺ No Test</div></div>
+        <div class="stat-box alias"><div class="stat-num" id="stat-alias">0</div><div class="stat-label">⚠ Alias Warn</div></div>
       </div>
     </div>
-
-    <!-- Progress bar -->
     <div class="progress-bar-wrap">
       <div class="progress-bar-label">Result breakdown</div>
       <div class="progress-track">
-        <div class="progress-pass"  id="prog-pass"></div>
-        <div class="progress-fail"  id="prog-fail"></div>
-        <div class="progress-notest" id="prog-notest"></div>
+        <div class="progress-pass"    id="prog-pass"></div>
+        <div class="progress-fail"    id="prog-fail"></div>
+        <div class="progress-notest"  id="prog-notest"></div>
       </div>
       <div class="progress-legend">
         <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Passed</div>
@@ -766,25 +196,20 @@
         <div class="leg-item"><div class="leg-dot" style="background:var(--surface2)"></div>No Test</div>
       </div>
     </div>
-
-    <!-- Results list -->
     <div class="filter-row">
       <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
       <button class="filter-btn" onclick="setFilter('pass',this)">Passed</button>
       <button class="filter-btn" onclick="setFilter('fail',this)">Failed</button>
       <button class="filter-btn" onclick="setFilter('notest',this)">No Test</button>
     </div>
-
-    <div class="section-title">Test Results</div>
+    <div class="section-title">Test Results </div>
     <div class="results-list" id="results-list"></div>
-
     <div class="timestamp" id="timestamp"></div>
   </div>
 
-  <!-- Empty state (no results yet) -->
   <div id="empty-view">
     <div class="empty-state">
-      <span class="empty-icon">⬡</span>
+      <span class="empty-icon">⭡</span>
       <div class="empty-title">No results loaded</div>
       <div class="empty-sub">
         Run IFert inside your Roblox executor.<br>
@@ -796,28 +221,29 @@
         <textarea id="paste-box" placeholder='Paste JSON here... {"executor":"Synapse X","passes":120,...}'
           style="width:100%;max-width:480px;height:90px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:11px;padding:10px 12px;resize:vertical;outline:none;"></textarea>
       </div>
-      <button onclick="loadPasted()" style="margin-top:10px;font-family:var(--mono);font-size:11px;padding:9px 22px;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer;letter-spacing:0.05em;">
-        Load JSON
-      </button>
+      <button onclick="loadPasted()" style="margin-top:10px;font-family:var(--mono);font-size:11px;padding:9px 22px;background:var(--accent);color:#fff;border:none;border-radius:7px;cursor:pointer;letter-spacing:0.05em;">Load JSON</button>
       <div style="margin-top:28px;">
         <button class="demo-tag" onclick="loadDemo()" style="cursor:pointer;border:none;font-family:var(--mono);">
-          <div class="pulse"></div>
-          Try demo results
+          <div class="pulse"></div>Try demo results
         </button>
       </div>
     </div>
   </div>
-
 </div>
 
 <script>
-// ══════════════════════════════════════
-//  DATA MODEL
-// ══════════════════════════════════════
-let currentFilter = 'all';
-let allRows = [];
+// ════════════════════════════════════════
+//  LZ-String (inline) — fixes URL too long
+//  Compresses ?r= param by ~70%
+// ════════════════════════════════════════
+var LZString=(function(){var f=String.fromCharCode,keyStrUriSafe="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",baseReverseDic={};function getBaseValue(a,b){if(!baseReverseDic[a]){baseReverseDic[a]={};for(var i=0;i<a.length;i++)baseReverseDic[a][a.charAt(i)]=i}return baseReverseDic[a][b]}var o={compressToEncodedURIComponent:function(e){return o._compress(e,6,function(a){return keyStrUriSafe.charAt(a)})},decompressFromEncodedURIComponent:function(e){return e?o._decompress(e.length,32,function(i){return getBaseValue(keyStrUriSafe,e.charAt(i))}):""},_compress:function(u,b,gC){if(u==null)return"";var i,v,cD={},cDC={},c="",wc="",w="",eI=2,dS=3,nB=2,data=[],dv=0,dp=0,ii;for(ii=0;ii<u.length;ii++){c=u.charAt(ii);if(!Object.prototype.hasOwnProperty.call(cD,c)){cD[c]=dS++;cDC[c]=true}wc=w+c;if(Object.prototype.hasOwnProperty.call(cD,wc)){w=wc}else{if(Object.prototype.hasOwnProperty.call(cDC,w)){if(w.charCodeAt(0)<256){for(i=0;i<nB;i++){dv=(dv<<1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++}v=w.charCodeAt(0);for(i=0;i<8;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}else{v=1;for(i=0;i<nB;i++){dv=(dv<<1)|v;if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v=0}v=w.charCodeAt(0);for(i=0;i<16;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}delete cDC[w]}else{v=cD[w];for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}cD[wc]=dS++;w=String(c)}}if(w!==""){if(Object.prototype.hasOwnProperty.call(cDC,w)){if(w.charCodeAt(0)<256){for(i=0;i<nB;i++){dv=(dv<<1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++}v=w.charCodeAt(0);for(i=0;i<8;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}else{v=1;for(i=0;i<nB;i++){dv=(dv<<1)|v;if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v=0}v=w.charCodeAt(0);for(i=0;i<16;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}delete cDC[w]}else{v=cD[w];for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}}v=2;for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}while(true){dv=(dv<<1);if(dp==b-1){data.push(gC(dv));break}else dp++}return data.join("")},_decompress:function(l,rv,gNV){var d=[],n,eI=4,dS=4,nB=3,e="",r=[],i,w,bits,resb,mp,p,c,data={val:gNV(0),pos:rv,idx:1};for(i=0;i<3;i++)d[i]=i;bits=0;mp=Math.pow(2,2);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}switch(n=bits){case 0:bits=0;mp=Math.pow(2,8);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}c=f(bits);break;case 1:bits=0;mp=Math.pow(2,16);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}c=f(bits);break;case 2:return""}d[3]=c;w=c;r.push(c);while(true){if(data.idx>l)return"";bits=0;mp=Math.pow(2,nB);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}switch(c=bits){case 0:bits=0;mp=Math.pow(2,8);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}d[dS++]=f(bits);c=dS-1;eI--;break;case 1:bits=0;mp=Math.pow(2,16);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}d[dS++]=f(bits);c=dS-1;eI--;break;case 2:return r.join("")}if(eI==0){eI=Math.pow(2,nB);nB++}if(d[c])e=d[c];else{if(c===dS)e=w+w.charAt(0);else return null}r.push(e);d[dS++]=w+e.charAt(0);eI--;if(eI==0){eI=Math.pow(2,nB);nB++}w=e}return r.join("")}};return o})();
 
-// ── Grade helper ──────────────────────
+// ════════════════════════════════════════
+//  DATA MODEL
+// ════════════════════════════════════════
+var currentFilter = 'all';
+var allRows = [];
+
 function getGrade(pct) {
   if (pct >= 95) return { letter: 'S', color: '#ffc14a', bg: 'rgba(255,193,74,0.15)' };
   if (pct >= 85) return { letter: 'A', color: '#3ddc97', bg: 'rgba(61,220,151,0.12)' };
@@ -827,7 +253,6 @@ function getGrade(pct) {
   return { letter: 'F', color: '#ff5f5f', bg: 'rgba(255,95,95,0.18)' };
 }
 
-// ── Ring color by grade ───────────────
 function ringColor(pct) {
   if (pct >= 85) return '#3ddc97';
   if (pct >= 70) return '#5b7cff';
@@ -835,362 +260,264 @@ function ringColor(pct) {
   return '#ff5f5f';
 }
 
-// ══════════════════════════════════════
-//  RENDER
-// ══════════════════════════════════════
-function renderResults(data) {
-  document.getElementById('empty-view').style.display  = 'none';
-  document.getElementById('results-view').style.display = 'block';
-
-  const passes  = data.passes  || 0;
-  const fails   = data.fails   || 0;
-  const notest  = data.notest  || 0;
-  const aliases = data.aliasWarn || 0;
-  const total   = passes + fails + notest;
-  const tested  = passes + fails;
-  const pct     = tested > 0 ? Math.round(passes / tested * 100) : 0;
-
-  // Executor card
-  document.getElementById('exec-name').textContent     = data.executor || 'Unknown';
-  document.getElementById('exec-version').textContent  = data.version  || '—';
-  document.getElementById('exec-identity').textContent = data.identity != null ? 'Level ' + data.identity : '—';
-  document.getElementById('exec-total').textContent    = total + ' tests';
-  document.getElementById('exec-date').textContent     = data.date || new Date().toLocaleDateString();
-
-  // Grade badge
-  const grade = getGrade(pct);
-  const badge = document.getElementById('grade-badge');
-  badge.textContent = grade.letter;
-  badge.style.color = grade.color;
-  badge.style.background = grade.bg;
-
-  // Stats
-  document.getElementById('stat-pass').textContent   = passes;
-  document.getElementById('stat-fail').textContent   = fails;
-  document.getElementById('stat-notest').textContent = notest;
-  document.getElementById('stat-alias').textContent  = aliases;
-
-  // Ring — animate after a tick
-  setTimeout(() => {
-    const circ = 408;
-    const offset = circ - (circ * pct / 100);
-    const ring = document.getElementById('ring-fg');
-    ring.style.strokeDashoffset = offset;
-    ring.style.stroke = ringColor(pct);
-    animCount(document.getElementById('ring-pct'), 0, pct, 1400, v => v + '%');
-  }, 80);
-
-  // Progress bars
-  setTimeout(() => {
-    document.getElementById('prog-pass').style.width   = (passes / total * 100) + '%';
-    document.getElementById('prog-fail').style.width   = (fails  / total * 100) + '%';
-    document.getElementById('prog-notest').style.width = (notest / total * 100) + '%';
-  }, 80);
-
-  // Timestamp
-  document.getElementById('timestamp').textContent =
-    'Generated ' + new Date().toLocaleString();
-
-  // Build result rows
-  allRows = data.results || [];
-  renderList();
-}
-
-function renderList() {
-  const list = document.getElementById('results-list');
-  list.innerHTML = '';
-
-  const filtered = currentFilter === 'all'
-    ? allRows
-    : allRows.filter(r => r.status === currentFilter);
-
-  // Group by category
-  const cats = {};
-  for (const r of filtered) {
-    const cat = r.category || 'misc';
-    if (!cats[cat]) cats[cat] = [];
-    cats[cat].push(r);
-  }
-
-  let delay = 0;
-  for (const [cat, rows] of Object.entries(cats)) {
-    // Category header
-    const hdr = document.createElement('div');
-    hdr.className = 'cat-header';
-    hdr.innerHTML = cat.toUpperCase() + '<div class="cat-header-line"></div>';
-    list.appendChild(hdr);
-
-    for (const r of rows) {
-      const row = document.createElement('div');
-      row.className = 'result-row ' + (r.status || 'notest');
-      row.style.animationDelay = delay + 's';
-      delay = Math.min(delay + 0.02, 0.5);
-
-      const icon = { pass: '✓', fail: '✗', notest: '○', alias: '⚠' }[r.status] || '?';
-      const msg  = r.message ? `<span class="result-msg">${escHtml(r.message)}</span>` : '';
-
-      row.innerHTML = `
-        <div class="result-icon ${r.status || 'notest'}">${icon}</div>
-        <span class="result-name">${escHtml(r.name)}</span>
-        ${msg}
-      `;
-      list.appendChild(row);
-    }
-  }
-
-  if (list.children.length === 0) {
-    list.innerHTML = `<div style="font-family:var(--mono);font-size:12px;color:var(--dim);padding:24px;text-align:center;">No results for this filter.</div>`;
-  }
-}
-
-// ══════════════════════════════════════
-//  FILTER
-// ══════════════════════════════════════
-function setFilter(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderList();
-}
-
-// ══════════════════════════════════════
-//  URL SHARE  (encode/decode via base64 in ?r= param)
-// ══════════════════════════════════════
-function encodeResults(data) {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-}
-
-function decodeResults(str) {
-  return JSON.parse(decodeURIComponent(escape(atob(str))));
-}
-
-function buildShareURL(data) {
-  const encoded = encodeResults(data);
-  return window.location.origin + window.location.pathname + '?r=' + encoded;
-}
-
-function showShareBar(url) {
-  const bar = document.getElementById('share-bar');
-  const urlEl = document.getElementById('share-url');
-  bar.style.display = 'flex';
-  urlEl.textContent = url;
-}
-
-function copyURL() {
-  const url = document.getElementById('share-url').textContent;
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = document.getElementById('copy-btn');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copy Link'; btn.classList.remove('copied'); }, 2000);
-  });
-}
-
-// ══════════════════════════════════════
-//  LOAD FROM URL PARAM
-// ══════════════════════════════════════
-function loadFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  const r = params.get('r');
-  if (r) {
-    try {
-      const data = decodeResults(r);
-      renderResults(data);
-      showShareBar(window.location.href);
-      return true;
-    } catch(e) {
-      console.error('Failed to decode results:', e);
-    }
-  }
-  return false;
-}
-
-// ══════════════════════════════════════
-//  LOAD FROM PASTED JSON
-// ══════════════════════════════════════
-function loadPasted() {
-  const raw = document.getElementById('paste-box').value.trim();
-  try {
-    const data = JSON.parse(raw);
-    renderResults(data);
-    const url = buildShareURL(data);
-    showShareBar(url);
-    history.replaceState(null, '', '?r=' + encodeResults(data));
-  } catch(e) {
-    alert('Invalid JSON: ' + e.message);
-  }
-}
-
-
-function loadDemo() {
-  const demo = {
-    executor: "Synapse X",
-    version: "2.1.0",
-    identity: 7,
-    date: new Date().toLocaleDateString(),
-    passes: 118,
-    fails: 14,
-    notest: 20,
-    aliasWarn: 3,
-    results: [
-      // Cache
-      {name:"cache.invalidate",   status:"pass",   category:"cache"},
-      {name:"cache.iscached",     status:"pass",   category:"cache"},
-      {name:"cache.replace",      status:"pass",   category:"cache"},
-      {name:"cloneref",           status:"pass",   category:"cache"},
-      {name:"compareinstances",   status:"pass",   category:"cache"},
-      // Closures
-      {name:"checkcaller",        status:"pass",   category:"closures"},
-      {name:"clonefunction",      status:"pass",   category:"closures"},
-      {name:"getcallingscript",   status:"notest", category:"closures"},
-      {name:"getscriptclosure",   status:"pass",   category:"closures"},
-      {name:"hookfunction",       status:"pass",   category:"closures"},
-      {name:"iscclosure",         status:"pass",   category:"closures"},
-      {name:"islclosure",         status:"pass",   category:"closures"},
-      {name:"isexecutorclosure",  status:"pass",   category:"closures"},
-      {name:"loadstring",         status:"pass",   category:"closures"},
-      {name:"newcclosure",        status:"pass",   category:"closures"},
-      // Crypt
-      {name:"crypt.base64encode", status:"pass",   category:"crypt"},
-      {name:"crypt.base64decode", status:"pass",   category:"crypt"},
-      {name:"crypt.encrypt",      status:"pass",   category:"crypt"},
-      {name:"crypt.decrypt",      status:"pass",   category:"crypt"},
-      {name:"crypt.generatebytes",status:"pass",   category:"crypt"},
-      {name:"crypt.generatekey",  status:"pass",   category:"crypt"},
-      {name:"crypt.hash",         status:"pass",   category:"crypt"},
-      {name:"crypt.hmac",         status:"fail",   category:"crypt",  message:"crypt.hmac not supported"},
-      {name:"crypt.random",       status:"pass",   category:"crypt"},
-      // Debug
-      {name:"debug.getconstant",  status:"pass",   category:"debug"},
-      {name:"debug.getconstants", status:"pass",   category:"debug"},
-      {name:"debug.getinfo",      status:"pass",   category:"debug"},
-      {name:"debug.getproto",     status:"pass",   category:"debug"},
-      {name:"debug.getprotos",    status:"pass",   category:"debug"},
-      {name:"debug.getstack",     status:"pass",   category:"debug"},
-      {name:"debug.getupvalue",   status:"pass",   category:"debug"},
-      {name:"debug.getupvalues",  status:"pass",   category:"debug"},
-      {name:"debug.setconstant",  status:"pass",   category:"debug"},
-      {name:"debug.setstack",     status:"pass",   category:"debug"},
-      {name:"debug.setupvalue",   status:"pass",   category:"debug"},
-      // Filesystem
-      {name:"readfile",           status:"pass",   category:"filesystem"},
-      {name:"writefile",          status:"pass",   category:"filesystem"},
-      {name:"appendfile",         status:"pass",   category:"filesystem"},
-      {name:"makefolder",         status:"pass",   category:"filesystem"},
-      {name:"listfiles",          status:"pass",   category:"filesystem"},
-      {name:"isfile",             status:"pass",   category:"filesystem"},
-      {name:"isfolder",           status:"pass",   category:"filesystem"},
-      {name:"delfolder",          status:"pass",   category:"filesystem"},
-      {name:"delfile",            status:"pass",   category:"filesystem"},
-      {name:"loadfile",           status:"pass",   category:"filesystem"},
-      {name:"dofile",             status:"notest", category:"filesystem"},
-      {name:"getcustomasset",     status:"pass",   category:"filesystem"},
-      // Instances
-      {name:"fireclickdetector",  status:"pass",   category:"instances"},
-      {name:"getcallbackvalue",   status:"pass",   category:"instances"},
-      {name:"getconnections",     status:"pass",   category:"instances"},
-      {name:"gethiddenproperty",  status:"pass",   category:"instances"},
-      {name:"sethiddenproperty",  status:"pass",   category:"instances"},
-      {name:"gethui",             status:"pass",   category:"instances"},
-      {name:"getinstances",       status:"pass",   category:"instances"},
-      {name:"getnilinstances",    status:"pass",   category:"instances"},
-      {name:"isscriptable",       status:"pass",   category:"instances"},
-      {name:"setscriptable",      status:"pass",   category:"instances"},
-      {name:"setrbxclipboard",    status:"notest", category:"instances"},
-      {name:"fireproximityprompt",status:"fail",   category:"instances", message:"ProximityPrompt not supported"},
-      {name:"firetouchinterest",  status:"pass",   category:"instances"},
-      // Metatable
-      {name:"getrawmetatable",    status:"pass",   category:"metatable"},
-      {name:"hookmetamethod",     status:"pass",   category:"metatable"},
-      {name:"getnamecallmethod",  status:"pass",   category:"metatable"},
-      {name:"isreadonly",         status:"pass",   category:"metatable"},
-      {name:"setrawmetatable",    status:"pass",   category:"metatable"},
-      {name:"setreadonly",        status:"pass",   category:"metatable"},
-      // Scripts
-      {name:"getgc",              status:"pass",   category:"scripts"},
-      {name:"getgenv",            status:"pass",   category:"scripts"},
-      {name:"getloadedmodules",   status:"pass",   category:"scripts"},
-      {name:"getrenv",            status:"pass",   category:"scripts"},
-      {name:"getrunningscripts",  status:"pass",   category:"scripts"},
-      {name:"getscriptbytecode",  status:"pass",   category:"scripts", message:"4821 bytes, header=0x04"},
-      {name:"getscripthash",      status:"pass",   category:"scripts"},
-      {name:"getscripts",         status:"pass",   category:"scripts"},
-      {name:"getsenv",            status:"pass",   category:"scripts"},
-      {name:"getthreadidentity",  status:"pass",   category:"scripts", message:"Identity: 7"},
-      {name:"setthreadidentity",  status:"pass",   category:"scripts"},
-      {name:"getscriptclosure",   status:"pass",   category:"scripts"},
-      {name:"require",            status:"pass",   category:"scripts"},
-      // Drawing
-      {name:"Drawing",            status:"pass",   category:"drawing"},
-      {name:"Drawing.new",        status:"pass",   category:"drawing"},
-      {name:"Drawing.Fonts",      status:"pass",   category:"drawing"},
-      {name:"isrenderobj",        status:"pass",   category:"drawing"},
-      {name:"getrenderproperty",  status:"pass",   category:"drawing"},
-      {name:"setrenderproperty",  status:"pass",   category:"drawing"},
-      {name:"cleardrawcache",     status:"pass",   category:"drawing"},
-      {name:"Drawing.Text",       status:"pass",   category:"drawing"},
-      {name:"Drawing.Image",      status:"pass",   category:"drawing"},
-      // WebSocket
-      {name:"WebSocket",          status:"pass",   category:"websocket"},
-      {name:"WebSocket.connect",  status:"pass",   category:"websocket", message:"echo confirmed"},
-      {name:"WebSocket.wss",      status:"fail",   category:"websocket", message:"WSS timed out after 5s"},
-      // Actors
-      {name:"getactors",          status:"fail",   category:"actors",    message:"global not found"},
-      {name:"run_on_actor",       status:"fail",   category:"actors",    message:"global not found"},
-      {name:"Actor.SendMessage",  status:"pass",   category:"actors"},
-      {name:"Actor.BindToMessage",status:"pass",   category:"actors"},
-      {name:"SharedTable",        status:"fail",   category:"actors",    message:"SharedTable not supported"},
-      // Misc
-      {name:"identifyexecutor",   status:"pass",   category:"misc",      message:"Executor: Synapse X 2.1.0"},
-      {name:"lz4compress",        status:"pass",   category:"misc"},
-      {name:"lz4decompress",      status:"pass",   category:"misc"},
-      {name:"request",            status:"pass",   category:"misc"},
-      {name:"setfpscap",          status:"pass",   category:"misc",      message:"~30fps at cap 30"},
-      // Signal
-      {name:"getconnections_deep",status:"pass",   category:"signal"},
-      {name:"connection.Disable_Enable",status:"pass",category:"signal"},
-      {name:"connection.Fire",    status:"pass",   category:"signal"},
-      {name:"connection.Function",status:"pass",   category:"signal"},
-      {name:"connection.Thread",  status:"pass",   category:"signal"},
-    ]
-  };
-  renderResults(demo);
-  const url = buildShareURL(demo);
-  showShareBar(url);
-  history.replaceState(null, '', '?r=' + encodeResults(demo));
-}
-
-// ══════════════════════════════════════
-//  UTILS
-// ══════════════════════════════════════
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function animCount(el, from, to, duration, fmt) {
-  const start = performance.now();
-  fmt = fmt || (v => v);
+  var start = performance.now();
+  fmt = fmt || function(v){ return v; };
   function step(now) {
-    const t = Math.min((now - start) / duration, 1);
-    const ease = 1 - Math.pow(1 - t, 3);
+    var t = Math.min((now - start) / duration, 1);
+    var ease = 1 - Math.pow(1 - t, 3);
     el.textContent = fmt(Math.round(from + (to - from) * ease));
     if (t < 1) requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
 }
 
+// ════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════
+function renderResults(data) {
+  document.getElementById('empty-view').style.display    = 'none';
+  document.getElementById('results-view').style.display  = 'block';
+  document.getElementById('back-btn-wrap').style.display = 'block';
 
+  var passes  = data.passes    || 0;
+  var fails   = data.fails     || 0;
+  var notest  = data.notest    || 0;
+  var aliases = data.aliasWarn || 0;
+  var total   = passes + fails + notest;
+  var tested  = passes + fails;
+  var pct     = tested > 0 ? Math.round(passes / tested * 100) : 0;
 
-window.addEventListener('load', () => {
+  document.getElementById('exec-name').textContent     = data.executor || 'Unknown';
+  document.getElementById('exec-version').textContent  = data.version  || '—';
+  document.getElementById('exec-identity').textContent = data.identity != null ? 'Level ' + data.identity : '—';
+  document.getElementById('exec-total').textContent    = total + ' tests';
+  document.getElementById('exec-date').textContent     = data.date || new Date().toLocaleDateString();
+
+  var grade = getGrade(pct);
+  var badge = document.getElementById('grade-badge');
+  badge.textContent      = grade.letter;
+  badge.style.color      = grade.color;
+  badge.style.background = grade.bg;
+
+  document.getElementById('stat-pass').textContent   = passes;
+  document.getElementById('stat-fail').textContent   = fails;
+  document.getElementById('stat-notest').textContent = notest;
+  document.getElementById('stat-alias').textContent  = aliases;
+
+  setTimeout(function() {
+    var ring = document.getElementById('ring-fg');
+    ring.style.strokeDashoffset = 408 - (408 * pct / 100);
+    ring.style.stroke = ringColor(pct);
+    animCount(document.getElementById('ring-pct'), 0, pct, 1400, function(v){ return v + '%'; });
+  }, 80);
+
+  setTimeout(function() {
+    document.getElementById('prog-pass').style.width   = (total ? passes/total*100 : 0) + '%';
+    document.getElementById('prog-fail').style.width   = (total ? fails/total*100  : 0) + '%';
+    document.getElementById('prog-notest').style.width = (total ? notest/total*100 : 0) + '%';
+  }, 80);
+
+  document.getElementById('timestamp').textContent = 'Generated ' + new Date().toLocaleString();
+  allRows = data.results || [];
+  renderList();
+}
+
+function renderList() {
+  var list = document.getElementById('results-list');
+  list.innerHTML = '';
+
+  var filtered = currentFilter === 'all'
+    ? allRows
+    : allRows.filter(function(r){ return r.status === currentFilter; });
+
+  var cats = {}, catOrder = [];
+  for (var i = 0; i < filtered.length; i++) {
+    var r = filtered[i];
+    var cat = r.category || 'misc';
+    if (!cats[cat]) { cats[cat] = []; catOrder.push(cat); }
+    cats[cat].push(r);
+  }
+
+  var delay = 0;
+  for (var ci = 0; ci < catOrder.length; ci++) {
+    var cat = catOrder[ci];
+    var hdr = document.createElement('div');
+    hdr.className = 'cat-header';
+    hdr.innerHTML = escHtml(cat.toUpperCase()) + '<div class="cat-header-line"></div>';
+    list.appendChild(hdr);
+
+    var rows = cats[cat];
+    for (var ri = 0; ri < rows.length; ri++) {
+      var r = rows[ri];
+      var row = document.createElement('div');
+      row.className = 'result-row ' + (r.status || 'notest');
+      row.style.animationDelay = delay + 's';
+      delay = Math.min(delay + 0.02, 0.5);
+      var icons = { pass:'✓', fail:'✗', notest:'○', alias:'⚠' };
+      var icon = icons[r.status] || '?';
+      var msg = r.message ? '<span class="result-msg">' + escHtml(r.message) + '</span>' : '';
+      row.innerHTML = '<div class="result-icon ' + (r.status||'notest') + '">' + icon + '</div>' +
+                      '<span class="result-name">' + escHtml(r.name) + '</span>' + msg;
+      list.appendChild(row);
+    }
+  }
+
+  if (!list.children.length) {
+    list.innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--dim);padding:24px;text-align:center;">No results for this filter.</div>';
+  }
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderList();
+}
+
+// ════════════════════════════════════════
+//  ENCODE / DECODE  (LZ compressed — fixes URL too long)
+// ════════════════════════════════════════
+function encodeResults(data) {
+  return LZString.compressToEncodedURIComponent(JSON.stringify(data));
+}
+
+// Full test list — used to reconstruct pass rows from slim URL payload
+var ALL_TESTS = [{"name":"cache.invalidate","category":"cache"},{"name":"cache.iscached","category":"cache"},{"name":"cache.replace","category":"cache"},{"name":"cloneref","category":"cache"},{"name":"compareinstances","category":"cache"},{"name":"checkcaller","category":"closures"},{"name":"clonefunction","category":"closures"},{"name":"getcallingscript","category":"closures"},{"name":"getscriptclosure","category":"closures"},{"name":"hookfunction","category":"closures"},{"name":"iscclosure","category":"closures"},{"name":"islclosure","category":"closures"},{"name":"isexecutorclosure","category":"closures"},{"name":"loadstring","category":"closures"},{"name":"newcclosure","category":"closures"},{"name":"rconsoleclear","category":"console"},{"name":"rconsolecreate","category":"console"},{"name":"rconsoledestroy","category":"console"},{"name":"rconsoleinput","category":"console"},{"name":"rconsoleprint","category":"console"},{"name":"rconsolesettitle","category":"console"},{"name":"crypt.base64encode","category":"crypt"},{"name":"crypt.base64decode","category":"crypt"},{"name":"crypt.encrypt","category":"crypt"},{"name":"crypt.decrypt","category":"crypt"},{"name":"crypt.generatebytes","category":"crypt"},{"name":"crypt.generatekey","category":"crypt"},{"name":"crypt.hash","category":"crypt"},{"name":"crypt.hmac","category":"crypt"},{"name":"crypt.random","category":"crypt"},{"name":"debug.getconstant","category":"debug"},{"name":"debug.getconstants","category":"debug"},{"name":"debug.getinfo","category":"debug"},{"name":"debug.getproto","category":"debug"},{"name":"debug.getprotos","category":"debug"},{"name":"debug.getstack","category":"debug"},{"name":"debug.getupvalue","category":"debug"},{"name":"debug.getupvalues","category":"debug"},{"name":"debug.setconstant","category":"debug"},{"name":"debug.setstack","category":"debug"},{"name":"debug.setupvalue","category":"debug"},{"name":"readfile","category":"filesystem"},{"name":"writefile","category":"filesystem"},{"name":"appendfile","category":"filesystem"},{"name":"makefolder","category":"filesystem"},{"name":"listfiles","category":"filesystem"},{"name":"isfile","category":"filesystem"},{"name":"isfolder","category":"filesystem"},{"name":"delfolder","category":"filesystem"},{"name":"delfile","category":"filesystem"},{"name":"loadfile","category":"filesystem"},{"name":"dofile","category":"filesystem"},{"name":"getcustomasset","category":"filesystem"},{"name":"isrbxactive","category":"input"},{"name":"mouse1click","category":"input"},{"name":"mouse1press","category":"input"},{"name":"mouse1release","category":"input"},{"name":"mouse2click","category":"input"},{"name":"mouse2press","category":"input"},{"name":"mouse2release","category":"input"},{"name":"mousemoveabs","category":"input"},{"name":"mousemoverel","category":"input"},{"name":"mousescroll","category":"input"},{"name":"fireclickdetector","category":"instances"},{"name":"getcallbackvalue","category":"instances"},{"name":"getconnections","category":"instances"},{"name":"getcustomasset","category":"instances"},{"name":"gethiddenproperty","category":"instances"},{"name":"sethiddenproperty","category":"instances"},{"name":"gethui","category":"instances"},{"name":"getinstances","category":"instances"},{"name":"getnilinstances","category":"instances"},{"name":"isscriptable","category":"instances"},{"name":"setscriptable","category":"instances"},{"name":"setrbxclipboard","category":"instances"},{"name":"fireproximityprompt","category":"instances"},{"name":"firetouchinterest","category":"instances"},{"name":"getrawmetatable","category":"metatable"},{"name":"hookmetamethod","category":"metatable"},{"name":"getnamecallmethod","category":"metatable"},{"name":"isreadonly","category":"metatable"},{"name":"setrawmetatable","category":"metatable"},{"name":"setreadonly","category":"metatable"},{"name":"identifyexecutor","category":"misc"},{"name":"lz4compress","category":"misc"},{"name":"lz4decompress","category":"misc"},{"name":"messagebox","category":"misc"},{"name":"queue_on_teleport","category":"misc"},{"name":"request","category":"misc"},{"name":"setclipboard","category":"misc"},{"name":"setfpscap","category":"misc"},{"name":"getgc","category":"scripts"},{"name":"getgenv","category":"scripts"},{"name":"getloadedmodules","category":"scripts"},{"name":"getrenv","category":"scripts"},{"name":"getrunningscripts","category":"scripts"},{"name":"getscriptbytecode","category":"scripts"},{"name":"getscripthash","category":"scripts"},{"name":"getscripts","category":"scripts"},{"name":"getsenv","category":"scripts"},{"name":"getthreadidentity","category":"scripts"},{"name":"setthreadidentity","category":"scripts"},{"name":"getscriptclosure","category":"scripts"},{"name":"require","category":"scripts"},{"name":"Drawing","category":"drawing"},{"name":"Drawing.new","category":"drawing"},{"name":"Drawing.Fonts","category":"drawing"},{"name":"isrenderobj","category":"drawing"},{"name":"getrenderproperty","category":"drawing"},{"name":"setrenderproperty","category":"drawing"},{"name":"cleardrawcache","category":"drawing"},{"name":"Drawing.Text","category":"drawing"},{"name":"Drawing.Image","category":"drawing"},{"name":"WebSocket","category":"websocket"},{"name":"WebSocket.connect","category":"websocket"},{"name":"WebSocket.wss","category":"websocket"},{"name":"getfenv","category":"environment"},{"name":"setfenv","category":"environment"},{"name":"getrawenv","category":"environment"},{"name":"syn.protect_gui","category":"environment"},{"name":"syn.queue_on_teleport","category":"environment"},{"name":"getmenv","category":"environment"},{"name":"hookfunction_restore","category":"environment"},{"name":"checkcaller_scope","category":"environment"},{"name":"table.freeze","category":"table_lib"},{"name":"table.isfrozen","category":"table_lib"},{"name":"table.clone","category":"table_lib"},{"name":"table.clear","category":"table_lib"},{"name":"table.find","category":"table_lib"},{"name":"table.move","category":"table_lib"},{"name":"table.pack","category":"table_lib"},{"name":"table.unpack","category":"table_lib"},{"name":"coroutine.running","category":"coroutine_lib"},{"name":"coroutine.status","category":"coroutine_lib"},{"name":"coroutine.wrap","category":"coroutine_lib"},{"name":"coroutine.yield","category":"coroutine_lib"},{"name":"coroutine.resume","category":"coroutine_lib"},{"name":"task.spawn","category":"coroutine_lib"},{"name":"task.defer","category":"coroutine_lib"},{"name":"getactors","category":"actors"},{"name":"run_on_actor","category":"actors"},{"name":"Actor.SendMessage","category":"actors"},{"name":"Actor.BindToMessage","category":"actors"},{"name":"Actor.BindToMessageParallel","category":"actors"},{"name":"desyncronize","category":"actors"},{"name":"task.synchronize","category":"actors"},{"name":"SharedTable","category":"actors"},{"name":"getconnections_deep","category":"signal"},{"name":"connection.Disable_Enable","category":"signal"},{"name":"connection.Fire","category":"signal"},{"name":"connection.Function","category":"signal"},{"name":"connection.Thread","category":"signal"},{"name":"string.split","category":"string_lib"},{"name":"string.trim","category":"string_lib"},{"name":"string.byte_multi","category":"string_lib"},{"name":"string.format_extended","category":"string_lib"},{"name":"string.gmatch_captures","category":"string_lib"},{"name":"string.gsub_fn","category":"string_lib"}];
+
+function decodeResults(str) {
+  var raw;
+  try {
+    var lz = LZString.decompressFromEncodedURIComponent(str);
+    if (lz) { raw = JSON.parse(lz); }
+  } catch(e) {}
+  if (!raw) {
+    try {
+      var b64 = str.replace(/%2B/gi,'+').replace(/%2F/gi,'/').replace(/%3D/gi,'=');
+      raw = JSON.parse(decodeURIComponent(escape(atob(b64))));
+    } catch(e2) {}
+  }
+  if (!raw) throw new Error('Could not decode results');
+
+  if (raw.e !== undefined && raw.p !== undefined) {
+    var statusMap = { p:'pass', f:'fail', n:'notest', a:'alias' };
+    var knownStatus = {};
+    var rows = raw.r || [];
+    for (var i = 0; i < rows.length; i++) {
+      knownStatus[rows[i].n] = statusMap[rows[i].s] || rows[i].s;
+    }
+    var fullResults = [];
+    for (var j = 0; j < ALL_TESTS.length; j++) {
+      var t = ALL_TESTS[j];
+      var st = knownStatus[t.name] || 'pass';
+      var msg;
+      for (var k = 0; k < rows.length; k++) {
+        if (rows[k].n === t.name && rows[k].m) { msg = rows[k].m; break; }
+      }
+      fullResults.push({ name: t.name, status: st, category: t.category, message: msg });
+    }
+    return {
+      executor:  raw.e || 'Unknown',
+      version:   raw.v || '?',
+      identity:  raw.i,
+      date:      raw.d || '',
+      passes:    raw.p || 0,
+      fails:     raw.f || 0,
+      notest:    raw.n || 0,
+      aliasWarn: raw.a || 0,
+      results:   fullResults
+    };
+  }
+
+  return raw;
+}
+
+function buildShareURL(data) {
+  return window.location.origin + window.location.pathname + '?r=' + encodeResults(data);
+}
+
+function showShareBar(url) {
+  document.getElementById('share-bar').style.display = 'flex';
+  document.getElementById('share-url').textContent = url;
+}
+
+function copyURL() {
+  var url = document.getElementById('share-url').textContent;
+  navigator.clipboard.writeText(url).then(function() {
+    var btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = 'Copy Link'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ════════════════════════════════════════
+//  BACK TO LANDING
+// ════════════════════════════════════════
+function showLanding() {
+  document.getElementById('results-view').style.display  = 'none';
+  document.getElementById('back-btn-wrap').style.display = 'none';
+  document.getElementById('share-bar').style.display     = 'none';
+  document.getElementById('empty-view').style.display    = 'block';
+  document.getElementById('paste-box').value = '';
+  history.replaceState(null, '', window.location.pathname);
+}
+
+// ════════════════════════════════════════
+//  LOAD FROM URL
+// ════════════════════════════════════════
+function loadFromURL() {
+  var r = new URLSearchParams(window.location.search).get('r');
+  if (r) {
+    try {
+      var data = decodeResults(r);
+      renderResults(data);
+      showShareBar(window.location.href);
+      return true;
+    } catch(e) { console.error('Failed to decode results:', e); }
+  }
+  return false;
+}
+
+// ════════════════════════════════════════
+//  LOAD FROM PASTED JSON
+// ════════════════════════════════════════
+function loadPasted() {
+  var raw = document.getElementById('paste-box').value.trim();
+  try {
+    var data = JSON.parse(raw);
+    renderResults(data);
+    var url = buildShareURL(data);
+    showShareBar(url);
+    history.replaceState(null, '', '?r=' + encodeResults(data));
+  } catch(e) { alert('Invalid JSON: ' + e.message); }
+}
+
+// ════════════════════════════════════════
+//  DEMO
+// ════════════════════════════════════════
+function loadDemo() {
+  var demo = {"executor":"Synapse X","version":"2.1.0","identity":7,"passes":118,"fails":14,"notest":20,"aliasWarn":3,"results":[{"name":"cache.invalidate","status":"pass","category":"cache"},{"name":"cache.iscached","status":"pass","category":"cache"},{"name":"cache.replace","status":"pass","category":"cache"},{"name":"cloneref","status":"pass","category":"cache"},{"name":"compareinstances","status":"pass","category":"cache"},{"name":"checkcaller","status":"pass","category":"closures"},{"name":"clonefunction","status":"pass","category":"closures"},{"name":"getcallingscript","status":"notest","category":"closures"},{"name":"getscriptclosure","status":"pass","category":"closures"},{"name":"hookfunction","status":"pass","category":"closures"},{"name":"iscclosure","status":"pass","category":"closures"},{"name":"islclosure","status":"pass","category":"closures"},{"name":"isexecutorclosure","status":"pass","category":"closures"},{"name":"loadstring","status":"pass","category":"closures"},{"name":"newcclosure","status":"pass","category":"closures"},{"name":"crypt.base64encode","status":"pass","category":"crypt"},{"name":"crypt.base64decode","status":"pass","category":"crypt"},{"name":"crypt.encrypt","status":"pass","category":"crypt"},{"name":"crypt.decrypt","status":"pass","category":"crypt"},{"name":"crypt.generatebytes","status":"pass","category":"crypt"},{"name":"crypt.generatekey","status":"pass","category":"crypt"},{"name":"crypt.hash","status":"pass","category":"crypt"},{"name":"crypt.hmac","status":"fail","category":"crypt","message":"crypt.hmac not supported"},{"name":"crypt.random","status":"pass","category":"crypt"},{"name":"debug.getconstant","status":"pass","category":"debug"},{"name":"debug.getconstants","status":"pass","category":"debug"},{"name":"debug.getinfo","status":"pass","category":"debug"},{"name":"debug.getproto","status":"pass","category":"debug"},{"name":"debug.getprotos","status":"pass","category":"debug"},{"name":"debug.getstack","status":"pass","category":"debug"},{"name":"debug.getupvalue","status":"pass","category":"debug"},{"name":"debug.getupvalues","status":"pass","category":"debug"},{"name":"debug.setconstant","status":"pass","category":"debug"},{"name":"debug.setstack","status":"pass","category":"debug"},{"name":"debug.setupvalue","status":"pass","category":"debug"},{"name":"readfile","status":"pass","category":"filesystem"},{"name":"writefile","status":"pass","category":"filesystem"},{"name":"appendfile","status":"pass","category":"filesystem"},{"name":"makefolder","status":"pass","category":"filesystem"},{"name":"listfiles","status":"pass","category":"filesystem"},{"name":"isfile","status":"pass","category":"filesystem"},{"name":"isfolder","status":"pass","category":"filesystem"},{"name":"delfolder","status":"pass","category":"filesystem"},{"name":"delfile","status":"pass","category":"filesystem"},{"name":"loadfile","status":"pass","category":"filesystem"},{"name":"dofile","status":"notest","category":"filesystem"},{"name":"getcustomasset","status":"pass","category":"filesystem"},{"name":"fireclickdetector","status":"pass","category":"instances"},{"name":"getcallbackvalue","status":"pass","category":"instances"},{"name":"getconnections","status":"pass","category":"instances"},{"name":"gethiddenproperty","status":"pass","category":"instances"},{"name":"sethiddenproperty","status":"pass","category":"instances"},{"name":"gethui","status":"pass","category":"instances"},{"name":"getinstances","status":"pass","category":"instances"},{"name":"getnilinstances","status":"pass","category":"instances"},{"name":"isscriptable","status":"pass","category":"instances"},{"name":"setscriptable","status":"pass","category":"instances"},{"name":"setrbxclipboard","status":"notest","category":"instances"},{"name":"fireproximityprompt","status":"fail","category":"instances","message":"ProximityPrompt not supported"},{"name":"firetouchinterest","status":"pass","category":"instances"},{"name":"getrawmetatable","status":"pass","category":"metatable"},{"name":"hookmetamethod","status":"pass","category":"metatable"},{"name":"getnamecallmethod","status":"pass","category":"metatable"},{"name":"isreadonly","status":"pass","category":"metatable"},{"name":"setrawmetatable","status":"pass","category":"metatable"},{"name":"setreadonly","status":"pass","category":"metatable"},{"name":"getgc","status":"pass","category":"scripts"},{"name":"getgenv","status":"pass","category":"scripts"},{"name":"getloadedmodules","status":"pass","category":"scripts"},{"name":"getrenv","status":"pass","category":"scripts"},{"name":"getrunningscripts","status":"pass","category":"scripts"},{"name":"getscriptbytecode","status":"pass","category":"scripts","message":"4821 bytes"},{"name":"getscripthash","status":"pass","category":"scripts"},{"name":"getscripts","status":"pass","category":"scripts"},{"name":"getsenv","status":"pass","category":"scripts"},{"name":"getthreadidentity","status":"pass","category":"scripts","message":"Identity: 7"},{"name":"setthreadidentity","status":"pass","category":"scripts"},{"name":"getscriptclosure","status":"pass","category":"scripts"},{"name":"require","status":"pass","category":"scripts"},{"name":"Drawing","status":"pass","category":"drawing"},{"name":"Drawing.new","status":"pass","category":"drawing"},{"name":"Drawing.Fonts","status":"pass","category":"drawing"},{"name":"isrenderobj","status":"pass","category":"drawing"},{"name":"getrenderproperty","status":"pass","category":"drawing"},{"name":"setrenderproperty","status":"pass","category":"drawing"},{"name":"cleardrawcache","status":"pass","category":"drawing"},{"name":"WebSocket","status":"pass","category":"websocket"},{"name":"WebSocket.connect","status":"pass","category":"websocket","message":"echo confirmed"},{"name":"WebSocket.wss","status":"fail","category":"websocket","message":"WSS timed out after 5s"},{"name":"getactors","status":"fail","category":"actors","message":"global not found"},{"name":"run_on_actor","status":"fail","category":"actors","message":"global not found"},{"name":"Actor.SendMessage","status":"pass","category":"actors"},{"name":"Actor.BindToMessage","status":"pass","category":"actors"},{"name":"SharedTable","status":"fail","category":"actors","message":"SharedTable not supported"},{"name":"identifyexecutor","status":"pass","category":"misc","message":"Synapse X 2.1.0"},{"name":"lz4compress","status":"pass","category":"misc"},{"name":"lz4decompress","status":"pass","category":"misc"},{"name":"request","status":"pass","category":"misc"},{"name":"setfpscap","status":"pass","category":"misc","message":"~30fps at cap 30"},{"name":"getconnections_deep","status":"pass","category":"signal"},{"name":"connection.Disable_Enable","status":"pass","category":"signal"},{"name":"connection.Fire","status":"pass","category":"signal"},{"name":"connection.Function","status":"pass","category":"signal"},{"name":"connection.Thread","status":"pass","category":"signal"}]};
+  demo.date = new Date().toLocaleDateString();
+  renderResults(demo);
+  var url = buildShareURL(demo);
+  showShareBar(url);
+  history.replaceState(null, '', '?r=' + encodeResults(demo));
+}
+
+window.addEventListener('load', function() {
   if (!loadFromURL()) {
     document.getElementById('empty-view').style.display = 'block';
   }
 });
 
-
 window.IFertLoad = function(data) {
   renderResults(data);
-  const url = buildShareURL(data);
+  var url = buildShareURL(data);
   showShareBar(url);
   history.replaceState(null, '', '?r=' + encodeResults(data));
 };
