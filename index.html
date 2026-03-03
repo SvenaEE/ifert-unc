@@ -232,18 +232,10 @@
 </div>
 
 <script>
-// ════════════════════════════════════════
-//  LZ-String (inline) — fixes URL too long
-//  Compresses ?r= param by ~70%
-// ════════════════════════════════════════
-var LZString=(function(){var f=String.fromCharCode,keyStrUriSafe="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",baseReverseDic={};function getBaseValue(a,b){if(!baseReverseDic[a]){baseReverseDic[a]={};for(var i=0;i<a.length;i++)baseReverseDic[a][a.charAt(i)]=i}return baseReverseDic[a][b]}var o={compressToEncodedURIComponent:function(e){return o._compress(e,6,function(a){return keyStrUriSafe.charAt(a)})},decompressFromEncodedURIComponent:function(e){return e?o._decompress(e.length,32,function(i){return getBaseValue(keyStrUriSafe,e.charAt(i))}):""},_compress:function(u,b,gC){if(u==null)return"";var i,v,cD={},cDC={},c="",wc="",w="",eI=2,dS=3,nB=2,data=[],dv=0,dp=0,ii;for(ii=0;ii<u.length;ii++){c=u.charAt(ii);if(!Object.prototype.hasOwnProperty.call(cD,c)){cD[c]=dS++;cDC[c]=true}wc=w+c;if(Object.prototype.hasOwnProperty.call(cD,wc)){w=wc}else{if(Object.prototype.hasOwnProperty.call(cDC,w)){if(w.charCodeAt(0)<256){for(i=0;i<nB;i++){dv=(dv<<1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++}v=w.charCodeAt(0);for(i=0;i<8;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}else{v=1;for(i=0;i<nB;i++){dv=(dv<<1)|v;if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v=0}v=w.charCodeAt(0);for(i=0;i<16;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}delete cDC[w]}else{v=cD[w];for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}cD[wc]=dS++;w=String(c)}}if(w!==""){if(Object.prototype.hasOwnProperty.call(cDC,w)){if(w.charCodeAt(0)<256){for(i=0;i<nB;i++){dv=(dv<<1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++}v=w.charCodeAt(0);for(i=0;i<8;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}else{v=1;for(i=0;i<nB;i++){dv=(dv<<1)|v;if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v=0}v=w.charCodeAt(0);for(i=0;i<16;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}delete cDC[w]}else{v=cD[w];for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}}v=2;for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}while(true){dv=(dv<<1);if(dp==b-1){data.push(gC(dv));break}else dp++}return data.join("")},_decompress:function(l,rv,gNV){var d=[],n,eI=4,dS=4,nB=3,e="",r=[],i,w,bits,resb,mp,p,c,data={val:gNV(0),pos:rv,idx:1};for(i=0;i<3;i++)d[i]=i;bits=0;mp=Math.pow(2,2);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}switch(n=bits){case 0:bits=0;mp=Math.pow(2,8);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}c=f(bits);break;case 1:bits=0;mp=Math.pow(2,16);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}c=f(bits);break;case 2:return""}d[3]=c;w=c;r.push(c);while(true){if(data.idx>l)return"";bits=0;mp=Math.pow(2,nB);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}switch(c=bits){case 0:bits=0;mp=Math.pow(2,8);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}d[dS++]=f(bits);c=dS-1;eI--;break;case 1:bits=0;mp=Math.pow(2,16);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}d[dS++]=f(bits);c=dS-1;eI--;break;case 2:return r.join("")}if(eI==0){eI=Math.pow(2,nB);nB++}if(d[c])e=d[c];else{if(c===dS)e=w+w.charAt(0);else return null}r.push(e);d[dS++]=w+e.charAt(0);eI--;if(eI==0){eI=Math.pow(2,nB);nB++}w=e}return r.join("")}};return o})();
 
-// ════════════════════════════════════════
-//  DATA MODEL
-// ════════════════════════════════════════
+var LZString=(function(){var f=String.fromCharCode,keyStrUriSafe="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$",baseReverseDic={};function getBaseValue(a,b){if(!baseReverseDic[a]){baseReverseDic[a]={};for(var i=0;i<a.length;i++)baseReverseDic[a][a.charAt(i)]=i}return baseReverseDic[a][b]}var o={compressToEncodedURIComponent:function(e){return o._compress(e,6,function(a){return keyStrUriSafe.charAt(a)})},decompressFromEncodedURIComponent:function(e){return e?o._decompress(e.length,32,function(i){return getBaseValue(keyStrUriSafe,e.charAt(i))}):""},_compress:function(u,b,gC){if(u==null)return"";var i,v,cD={},cDC={},c="",wc="",w="",eI=2,dS=3,nB=2,data=[],dv=0,dp=0,ii;for(ii=0;ii<u.length;ii++){c=u.charAt(ii);if(!Object.prototype.hasOwnProperty.call(cD,c)){cD[c]=dS++;cDC[c]=true}wc=w+c;if(Object.prototype.hasOwnProperty.call(cD,wc)){w=wc}else{if(Object.prototype.hasOwnProperty.call(cDC,w)){if(w.charCodeAt(0)<256){for(i=0;i<nB;i++){dv=(dv<<1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++}v=w.charCodeAt(0);for(i=0;i<8;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}else{v=1;for(i=0;i<nB;i++){dv=(dv<<1)|v;if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v=0}v=w.charCodeAt(0);for(i=0;i<16;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}delete cDC[w]}else{v=cD[w];for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}cD[wc]=dS++;w=String(c)}}if(w!==""){if(Object.prototype.hasOwnProperty.call(cDC,w)){if(w.charCodeAt(0)<256){for(i=0;i<nB;i++){dv=(dv<<1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++}v=w.charCodeAt(0);for(i=0;i<8;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}else{v=1;for(i=0;i<nB;i++){dv=(dv<<1)|v;if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v=0}v=w.charCodeAt(0);for(i=0;i<16;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}delete cDC[w]}else{v=cD[w];for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}}eI--;if(eI==0){eI=Math.pow(2,nB);nB++}}v=2;for(i=0;i<nB;i++){dv=(dv<<1)|(v&1);if(dp==b-1){dp=0;data.push(gC(dv));dv=0}else dp++;v>>=1}while(true){dv=(dv<<1);if(dp==b-1){data.push(gC(dv));break}else dp++}return data.join("")},_decompress:function(l,rv,gNV){var d=[],n,eI=4,dS=4,nB=3,e="",r=[],i,w,bits,resb,mp,p,c,data={val:gNV(0),pos:rv,idx:1};for(i=0;i<3;i++)d[i]=i;bits=0;mp=Math.pow(2,2);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}switch(n=bits){case 0:bits=0;mp=Math.pow(2,8);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}c=f(bits);break;case 1:bits=0;mp=Math.pow(2,16);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}c=f(bits);break;case 2:return""}d[3]=c;w=c;r.push(c);while(true){if(data.idx>l)return"";bits=0;mp=Math.pow(2,nB);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}switch(c=bits){case 0:bits=0;mp=Math.pow(2,8);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}d[dS++]=f(bits);c=dS-1;eI--;break;case 1:bits=0;mp=Math.pow(2,16);p=1;while(p!=mp){resb=data.val&data.pos;data.pos>>=1;if(data.pos==0){data.pos=rv;data.val=gNV(data.idx++)}bits|=(resb>0?1:0)*p;p<<=1}d[dS++]=f(bits);c=dS-1;eI--;break;case 2:return r.join("")}if(eI==0){eI=Math.pow(2,nB);nB++}if(d[c])e=d[c];else{if(c===dS)e=w+w.charAt(0);else return null}r.push(e);d[dS++]=w+e.charAt(0);eI--;if(eI==0){eI=Math.pow(2,nB);nB++}w=e}return r.join("")}};return o})();
 var currentFilter = 'all';
 var allRows = [];
-
 function getGrade(pct) {
   if (pct >= 95) return { letter: 'S', color: '#ffc14a', bg: 'rgba(255,193,74,0.15)' };
   if (pct >= 85) return { letter: 'A', color: '#3ddc97', bg: 'rgba(61,220,151,0.12)' };
@@ -252,18 +244,15 @@ function getGrade(pct) {
   if (pct >= 40) return { letter: 'D', color: '#ff6b6b', bg: 'rgba(255,107,107,0.15)' };
   return { letter: 'F', color: '#ff5f5f', bg: 'rgba(255,95,95,0.18)' };
 }
-
 function ringColor(pct) {
   if (pct >= 85) return '#3ddc97';
   if (pct >= 70) return '#5b7cff';
   if (pct >= 50) return '#ffc14a';
   return '#ff5f5f';
 }
-
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-
 function animCount(el, from, to, duration, fmt) {
   var start = performance.now();
   fmt = fmt || function(v){ return v; };
@@ -275,15 +264,10 @@ function animCount(el, from, to, duration, fmt) {
   }
   requestAnimationFrame(step);
 }
-
-// ════════════════════════════════════════
-//  RENDER
-// ════════════════════════════════════════
 function renderResults(data) {
   document.getElementById('empty-view').style.display    = 'none';
   document.getElementById('results-view').style.display  = 'block';
   document.getElementById('back-btn-wrap').style.display = 'block';
-
   var passes  = data.passes    || 0;
   var fails   = data.fails     || 0;
   var notest  = data.notest    || 0;
@@ -291,50 +275,41 @@ function renderResults(data) {
   var total   = passes + fails + notest;
   var tested  = passes + fails;
   var pct     = tested > 0 ? Math.round(passes / tested * 100) : 0;
-
   document.getElementById('exec-name').textContent     = data.executor || 'Unknown';
   document.getElementById('exec-version').textContent  = data.version  || '—';
   document.getElementById('exec-identity').textContent = data.identity != null ? 'Level ' + data.identity : '—';
   document.getElementById('exec-total').textContent    = total + ' tests';
   document.getElementById('exec-date').textContent     = data.date || new Date().toLocaleDateString();
-
   var grade = getGrade(pct);
   var badge = document.getElementById('grade-badge');
   badge.textContent      = grade.letter;
   badge.style.color      = grade.color;
   badge.style.background = grade.bg;
-
   document.getElementById('stat-pass').textContent   = passes;
   document.getElementById('stat-fail').textContent   = fails;
   document.getElementById('stat-notest').textContent = notest;
   document.getElementById('stat-alias').textContent  = aliases;
-
   setTimeout(function() {
     var ring = document.getElementById('ring-fg');
     ring.style.strokeDashoffset = 408 - (408 * pct / 100);
     ring.style.stroke = ringColor(pct);
     animCount(document.getElementById('ring-pct'), 0, pct, 1400, function(v){ return v + '%'; });
   }, 80);
-
   setTimeout(function() {
     document.getElementById('prog-pass').style.width   = (total ? passes/total*100 : 0) + '%';
     document.getElementById('prog-fail').style.width   = (total ? fails/total*100  : 0) + '%';
     document.getElementById('prog-notest').style.width = (total ? notest/total*100 : 0) + '%';
   }, 80);
-
   document.getElementById('timestamp').textContent = 'Generated ' + new Date().toLocaleString();
   allRows = data.results || [];
   renderList();
 }
-
 function renderList() {
   var list = document.getElementById('results-list');
   list.innerHTML = '';
-
   var filtered = currentFilter === 'all'
     ? allRows
     : allRows.filter(function(r){ return r.status === currentFilter; });
-
   var cats = {}, catOrder = [];
   for (var i = 0; i < filtered.length; i++) {
     var r = filtered[i];
@@ -342,7 +317,6 @@ function renderList() {
     if (!cats[cat]) { cats[cat] = []; catOrder.push(cat); }
     cats[cat].push(r);
   }
-
   var delay = 0;
   for (var ci = 0; ci < catOrder.length; ci++) {
     var cat = catOrder[ci];
@@ -350,7 +324,6 @@ function renderList() {
     hdr.className = 'cat-header';
     hdr.innerHTML = escHtml(cat.toUpperCase()) + '<div class="cat-header-line"></div>';
     list.appendChild(hdr);
-
     var rows = cats[cat];
     for (var ri = 0; ri < rows.length; ri++) {
       var r = rows[ri];
@@ -366,29 +339,20 @@ function renderList() {
       list.appendChild(row);
     }
   }
-
   if (!list.children.length) {
     list.innerHTML = '<div style="font-family:var(--mono);font-size:12px;color:var(--dim);padding:24px;text-align:center;">No results for this filter.</div>';
   }
 }
-
 function setFilter(f, btn) {
   currentFilter = f;
   document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   renderList();
 }
-
-// ════════════════════════════════════════
-//  ENCODE / DECODE  (LZ compressed — fixes URL too long)
-// ════════════════════════════════════════
 function encodeResults(data) {
   return LZString.compressToEncodedURIComponent(JSON.stringify(data));
 }
-
-// Full test list — used to reconstruct pass rows from slim URL payload
 var ALL_TESTS = [{"name":"cache.invalidate","category":"cache"},{"name":"cache.iscached","category":"cache"},{"name":"cache.replace","category":"cache"},{"name":"cloneref","category":"cache"},{"name":"compareinstances","category":"cache"},{"name":"checkcaller","category":"closures"},{"name":"clonefunction","category":"closures"},{"name":"getcallingscript","category":"closures"},{"name":"getscriptclosure","category":"closures"},{"name":"hookfunction","category":"closures"},{"name":"iscclosure","category":"closures"},{"name":"islclosure","category":"closures"},{"name":"isexecutorclosure","category":"closures"},{"name":"loadstring","category":"closures"},{"name":"newcclosure","category":"closures"},{"name":"rconsoleclear","category":"console"},{"name":"rconsolecreate","category":"console"},{"name":"rconsoledestroy","category":"console"},{"name":"rconsoleinput","category":"console"},{"name":"rconsoleprint","category":"console"},{"name":"rconsolesettitle","category":"console"},{"name":"crypt.base64encode","category":"crypt"},{"name":"crypt.base64decode","category":"crypt"},{"name":"crypt.encrypt","category":"crypt"},{"name":"crypt.decrypt","category":"crypt"},{"name":"crypt.generatebytes","category":"crypt"},{"name":"crypt.generatekey","category":"crypt"},{"name":"crypt.hash","category":"crypt"},{"name":"crypt.hmac","category":"crypt"},{"name":"crypt.random","category":"crypt"},{"name":"debug.getconstant","category":"debug"},{"name":"debug.getconstants","category":"debug"},{"name":"debug.getinfo","category":"debug"},{"name":"debug.getproto","category":"debug"},{"name":"debug.getprotos","category":"debug"},{"name":"debug.getstack","category":"debug"},{"name":"debug.getupvalue","category":"debug"},{"name":"debug.getupvalues","category":"debug"},{"name":"debug.setconstant","category":"debug"},{"name":"debug.setstack","category":"debug"},{"name":"debug.setupvalue","category":"debug"},{"name":"readfile","category":"filesystem"},{"name":"writefile","category":"filesystem"},{"name":"appendfile","category":"filesystem"},{"name":"makefolder","category":"filesystem"},{"name":"listfiles","category":"filesystem"},{"name":"isfile","category":"filesystem"},{"name":"isfolder","category":"filesystem"},{"name":"delfolder","category":"filesystem"},{"name":"delfile","category":"filesystem"},{"name":"loadfile","category":"filesystem"},{"name":"dofile","category":"filesystem"},{"name":"getcustomasset","category":"filesystem"},{"name":"isrbxactive","category":"input"},{"name":"mouse1click","category":"input"},{"name":"mouse1press","category":"input"},{"name":"mouse1release","category":"input"},{"name":"mouse2click","category":"input"},{"name":"mouse2press","category":"input"},{"name":"mouse2release","category":"input"},{"name":"mousemoveabs","category":"input"},{"name":"mousemoverel","category":"input"},{"name":"mousescroll","category":"input"},{"name":"fireclickdetector","category":"instances"},{"name":"getcallbackvalue","category":"instances"},{"name":"getconnections","category":"instances"},{"name":"getcustomasset","category":"instances"},{"name":"gethiddenproperty","category":"instances"},{"name":"sethiddenproperty","category":"instances"},{"name":"gethui","category":"instances"},{"name":"getinstances","category":"instances"},{"name":"getnilinstances","category":"instances"},{"name":"isscriptable","category":"instances"},{"name":"setscriptable","category":"instances"},{"name":"setrbxclipboard","category":"instances"},{"name":"fireproximityprompt","category":"instances"},{"name":"firetouchinterest","category":"instances"},{"name":"getrawmetatable","category":"metatable"},{"name":"hookmetamethod","category":"metatable"},{"name":"getnamecallmethod","category":"metatable"},{"name":"isreadonly","category":"metatable"},{"name":"setrawmetatable","category":"metatable"},{"name":"setreadonly","category":"metatable"},{"name":"identifyexecutor","category":"misc"},{"name":"lz4compress","category":"misc"},{"name":"lz4decompress","category":"misc"},{"name":"messagebox","category":"misc"},{"name":"queue_on_teleport","category":"misc"},{"name":"request","category":"misc"},{"name":"setclipboard","category":"misc"},{"name":"setfpscap","category":"misc"},{"name":"getgc","category":"scripts"},{"name":"getgenv","category":"scripts"},{"name":"getloadedmodules","category":"scripts"},{"name":"getrenv","category":"scripts"},{"name":"getrunningscripts","category":"scripts"},{"name":"getscriptbytecode","category":"scripts"},{"name":"getscripthash","category":"scripts"},{"name":"getscripts","category":"scripts"},{"name":"getsenv","category":"scripts"},{"name":"getthreadidentity","category":"scripts"},{"name":"setthreadidentity","category":"scripts"},{"name":"getscriptclosure","category":"scripts"},{"name":"require","category":"scripts"},{"name":"Drawing","category":"drawing"},{"name":"Drawing.new","category":"drawing"},{"name":"Drawing.Fonts","category":"drawing"},{"name":"isrenderobj","category":"drawing"},{"name":"getrenderproperty","category":"drawing"},{"name":"setrenderproperty","category":"drawing"},{"name":"cleardrawcache","category":"drawing"},{"name":"Drawing.Text","category":"drawing"},{"name":"Drawing.Image","category":"drawing"},{"name":"WebSocket","category":"websocket"},{"name":"WebSocket.connect","category":"websocket"},{"name":"WebSocket.wss","category":"websocket"},{"name":"getfenv","category":"environment"},{"name":"setfenv","category":"environment"},{"name":"getrawenv","category":"environment"},{"name":"syn.protect_gui","category":"environment"},{"name":"syn.queue_on_teleport","category":"environment"},{"name":"getmenv","category":"environment"},{"name":"hookfunction_restore","category":"environment"},{"name":"checkcaller_scope","category":"environment"},{"name":"table.freeze","category":"table_lib"},{"name":"table.isfrozen","category":"table_lib"},{"name":"table.clone","category":"table_lib"},{"name":"table.clear","category":"table_lib"},{"name":"table.find","category":"table_lib"},{"name":"table.move","category":"table_lib"},{"name":"table.pack","category":"table_lib"},{"name":"table.unpack","category":"table_lib"},{"name":"coroutine.running","category":"coroutine_lib"},{"name":"coroutine.status","category":"coroutine_lib"},{"name":"coroutine.wrap","category":"coroutine_lib"},{"name":"coroutine.yield","category":"coroutine_lib"},{"name":"coroutine.resume","category":"coroutine_lib"},{"name":"task.spawn","category":"coroutine_lib"},{"name":"task.defer","category":"coroutine_lib"},{"name":"getactors","category":"actors"},{"name":"run_on_actor","category":"actors"},{"name":"Actor.SendMessage","category":"actors"},{"name":"Actor.BindToMessage","category":"actors"},{"name":"Actor.BindToMessageParallel","category":"actors"},{"name":"desyncronize","category":"actors"},{"name":"task.synchronize","category":"actors"},{"name":"SharedTable","category":"actors"},{"name":"getconnections_deep","category":"signal"},{"name":"connection.Disable_Enable","category":"signal"},{"name":"connection.Fire","category":"signal"},{"name":"connection.Function","category":"signal"},{"name":"connection.Thread","category":"signal"},{"name":"string.split","category":"string_lib"},{"name":"string.trim","category":"string_lib"},{"name":"string.byte_multi","category":"string_lib"},{"name":"string.format_extended","category":"string_lib"},{"name":"string.gmatch_captures","category":"string_lib"},{"name":"string.gsub_fn","category":"string_lib"}];
-
 function decodeResults(str) {
   var raw;
   try {
@@ -454,10 +418,6 @@ function copyURL() {
     setTimeout(function(){ btn.textContent = 'Copy Link'; btn.classList.remove('copied'); }, 2000);
   });
 }
-
-// ════════════════════════════════════════
-//  BACK TO LANDING
-// ════════════════════════════════════════
 function showLanding() {
   document.getElementById('results-view').style.display  = 'none';
   document.getElementById('back-btn-wrap').style.display = 'none';
@@ -466,10 +426,6 @@ function showLanding() {
   document.getElementById('paste-box').value = '';
   history.replaceState(null, '', window.location.pathname);
 }
-
-// ════════════════════════════════════════
-//  LOAD FROM URL
-// ════════════════════════════════════════
 function loadFromURL() {
   var r = new URLSearchParams(window.location.search).get('r');
   if (r) {
@@ -482,10 +438,6 @@ function loadFromURL() {
   }
   return false;
 }
-
-// ════════════════════════════════════════
-//  LOAD FROM PASTED JSON
-// ════════════════════════════════════════
 function loadPasted() {
   var raw = document.getElementById('paste-box').value.trim();
   try {
@@ -496,25 +448,19 @@ function loadPasted() {
     history.replaceState(null, '', '?r=' + encodeResults(data));
   } catch(e) { alert('Invalid JSON: ' + e.message); }
 }
-
-// ════════════════════════════════════════
-//  DEMO
-// ════════════════════════════════════════
 function loadDemo() {
-  var demo = {"executor":"Synapse X","version":"2.1.0","identity":7,"passes":118,"fails":14,"notest":20,"aliasWarn":3,"results":[{"name":"cache.invalidate","status":"pass","category":"cache"},{"name":"cache.iscached","status":"pass","category":"cache"},{"name":"cache.replace","status":"pass","category":"cache"},{"name":"cloneref","status":"pass","category":"cache"},{"name":"compareinstances","status":"pass","category":"cache"},{"name":"checkcaller","status":"pass","category":"closures"},{"name":"clonefunction","status":"pass","category":"closures"},{"name":"getcallingscript","status":"notest","category":"closures"},{"name":"getscriptclosure","status":"pass","category":"closures"},{"name":"hookfunction","status":"pass","category":"closures"},{"name":"iscclosure","status":"pass","category":"closures"},{"name":"islclosure","status":"pass","category":"closures"},{"name":"isexecutorclosure","status":"pass","category":"closures"},{"name":"loadstring","status":"pass","category":"closures"},{"name":"newcclosure","status":"pass","category":"closures"},{"name":"crypt.base64encode","status":"pass","category":"crypt"},{"name":"crypt.base64decode","status":"pass","category":"crypt"},{"name":"crypt.encrypt","status":"pass","category":"crypt"},{"name":"crypt.decrypt","status":"pass","category":"crypt"},{"name":"crypt.generatebytes","status":"pass","category":"crypt"},{"name":"crypt.generatekey","status":"pass","category":"crypt"},{"name":"crypt.hash","status":"pass","category":"crypt"},{"name":"crypt.hmac","status":"fail","category":"crypt","message":"crypt.hmac not supported"},{"name":"crypt.random","status":"pass","category":"crypt"},{"name":"debug.getconstant","status":"pass","category":"debug"},{"name":"debug.getconstants","status":"pass","category":"debug"},{"name":"debug.getinfo","status":"pass","category":"debug"},{"name":"debug.getproto","status":"pass","category":"debug"},{"name":"debug.getprotos","status":"pass","category":"debug"},{"name":"debug.getstack","status":"pass","category":"debug"},{"name":"debug.getupvalue","status":"pass","category":"debug"},{"name":"debug.getupvalues","status":"pass","category":"debug"},{"name":"debug.setconstant","status":"pass","category":"debug"},{"name":"debug.setstack","status":"pass","category":"debug"},{"name":"debug.setupvalue","status":"pass","category":"debug"},{"name":"readfile","status":"pass","category":"filesystem"},{"name":"writefile","status":"pass","category":"filesystem"},{"name":"appendfile","status":"pass","category":"filesystem"},{"name":"makefolder","status":"pass","category":"filesystem"},{"name":"listfiles","status":"pass","category":"filesystem"},{"name":"isfile","status":"pass","category":"filesystem"},{"name":"isfolder","status":"pass","category":"filesystem"},{"name":"delfolder","status":"pass","category":"filesystem"},{"name":"delfile","status":"pass","category":"filesystem"},{"name":"loadfile","status":"pass","category":"filesystem"},{"name":"dofile","status":"notest","category":"filesystem"},{"name":"getcustomasset","status":"pass","category":"filesystem"},{"name":"fireclickdetector","status":"pass","category":"instances"},{"name":"getcallbackvalue","status":"pass","category":"instances"},{"name":"getconnections","status":"pass","category":"instances"},{"name":"gethiddenproperty","status":"pass","category":"instances"},{"name":"sethiddenproperty","status":"pass","category":"instances"},{"name":"gethui","status":"pass","category":"instances"},{"name":"getinstances","status":"pass","category":"instances"},{"name":"getnilinstances","status":"pass","category":"instances"},{"name":"isscriptable","status":"pass","category":"instances"},{"name":"setscriptable","status":"pass","category":"instances"},{"name":"setrbxclipboard","status":"notest","category":"instances"},{"name":"fireproximityprompt","status":"fail","category":"instances","message":"ProximityPrompt not supported"},{"name":"firetouchinterest","status":"pass","category":"instances"},{"name":"getrawmetatable","status":"pass","category":"metatable"},{"name":"hookmetamethod","status":"pass","category":"metatable"},{"name":"getnamecallmethod","status":"pass","category":"metatable"},{"name":"isreadonly","status":"pass","category":"metatable"},{"name":"setrawmetatable","status":"pass","category":"metatable"},{"name":"setreadonly","status":"pass","category":"metatable"},{"name":"getgc","status":"pass","category":"scripts"},{"name":"getgenv","status":"pass","category":"scripts"},{"name":"getloadedmodules","status":"pass","category":"scripts"},{"name":"getrenv","status":"pass","category":"scripts"},{"name":"getrunningscripts","status":"pass","category":"scripts"},{"name":"getscriptbytecode","status":"pass","category":"scripts","message":"4821 bytes"},{"name":"getscripthash","status":"pass","category":"scripts"},{"name":"getscripts","status":"pass","category":"scripts"},{"name":"getsenv","status":"pass","category":"scripts"},{"name":"getthreadidentity","status":"pass","category":"scripts","message":"Identity: 7"},{"name":"setthreadidentity","status":"pass","category":"scripts"},{"name":"getscriptclosure","status":"pass","category":"scripts"},{"name":"require","status":"pass","category":"scripts"},{"name":"Drawing","status":"pass","category":"drawing"},{"name":"Drawing.new","status":"pass","category":"drawing"},{"name":"Drawing.Fonts","status":"pass","category":"drawing"},{"name":"isrenderobj","status":"pass","category":"drawing"},{"name":"getrenderproperty","status":"pass","category":"drawing"},{"name":"setrenderproperty","status":"pass","category":"drawing"},{"name":"cleardrawcache","status":"pass","category":"drawing"},{"name":"WebSocket","status":"pass","category":"websocket"},{"name":"WebSocket.connect","status":"pass","category":"websocket","message":"echo confirmed"},{"name":"WebSocket.wss","status":"fail","category":"websocket","message":"WSS timed out after 5s"},{"name":"getactors","status":"fail","category":"actors","message":"global not found"},{"name":"run_on_actor","status":"fail","category":"actors","message":"global not found"},{"name":"Actor.SendMessage","status":"pass","category":"actors"},{"name":"Actor.BindToMessage","status":"pass","category":"actors"},{"name":"SharedTable","status":"fail","category":"actors","message":"SharedTable not supported"},{"name":"identifyexecutor","status":"pass","category":"misc","message":"Synapse X 2.1.0"},{"name":"lz4compress","status":"pass","category":"misc"},{"name":"lz4decompress","status":"pass","category":"misc"},{"name":"request","status":"pass","category":"misc"},{"name":"setfpscap","status":"pass","category":"misc","message":"~30fps at cap 30"},{"name":"getconnections_deep","status":"pass","category":"signal"},{"name":"connection.Disable_Enable","status":"pass","category":"signal"},{"name":"connection.Fire","status":"pass","category":"signal"},{"name":"connection.Function","status":"pass","category":"signal"},{"name":"connection.Thread","status":"pass","category":"signal"}]};
+  var demo = {"executor":"Synapse X Demo Btw","version":"2.1.0","identity":67,"passes":118,"fails":14,"notest":20,"aliasWarn":3,"results":[{"name":"cache.invalidate","status":"pass","category":"cache"},{"name":"cache.iscached","status":"pass","category":"cache"},{"name":"cache.replace","status":"pass","category":"cache"},{"name":"cloneref","status":"pass","category":"cache"},{"name":"compareinstances","status":"pass","category":"cache"},{"name":"checkcaller","status":"pass","category":"closures"},{"name":"clonefunction","status":"pass","category":"closures"},{"name":"getcallingscript","status":"notest","category":"closures"},{"name":"getscriptclosure","status":"pass","category":"closures"},{"name":"hookfunction","status":"pass","category":"closures"},{"name":"iscclosure","status":"pass","category":"closures"},{"name":"islclosure","status":"pass","category":"closures"},{"name":"isexecutorclosure","status":"pass","category":"closures"},{"name":"loadstring","status":"pass","category":"closures"},{"name":"newcclosure","status":"pass","category":"closures"},{"name":"crypt.base64encode","status":"pass","category":"crypt"},{"name":"crypt.base64decode","status":"pass","category":"crypt"},{"name":"crypt.encrypt","status":"pass","category":"crypt"},{"name":"crypt.decrypt","status":"pass","category":"crypt"},{"name":"crypt.generatebytes","status":"pass","category":"crypt"},{"name":"crypt.generatekey","status":"pass","category":"crypt"},{"name":"crypt.hash","status":"pass","category":"crypt"},{"name":"crypt.hmac","status":"fail","category":"crypt","message":"crypt.hmac not supported"},{"name":"crypt.random","status":"pass","category":"crypt"},{"name":"debug.getconstant","status":"pass","category":"debug"},{"name":"debug.getconstants","status":"pass","category":"debug"},{"name":"debug.getinfo","status":"pass","category":"debug"},{"name":"debug.getproto","status":"pass","category":"debug"},{"name":"debug.getprotos","status":"pass","category":"debug"},{"name":"debug.getstack","status":"pass","category":"debug"},{"name":"debug.getupvalue","status":"pass","category":"debug"},{"name":"debug.getupvalues","status":"pass","category":"debug"},{"name":"debug.setconstant","status":"pass","category":"debug"},{"name":"debug.setstack","status":"pass","category":"debug"},{"name":"debug.setupvalue","status":"pass","category":"debug"},{"name":"readfile","status":"pass","category":"filesystem"},{"name":"writefile","status":"pass","category":"filesystem"},{"name":"appendfile","status":"pass","category":"filesystem"},{"name":"makefolder","status":"pass","category":"filesystem"},{"name":"listfiles","status":"pass","category":"filesystem"},{"name":"isfile","status":"pass","category":"filesystem"},{"name":"isfolder","status":"pass","category":"filesystem"},{"name":"delfolder","status":"pass","category":"filesystem"},{"name":"delfile","status":"pass","category":"filesystem"},{"name":"loadfile","status":"pass","category":"filesystem"},{"name":"dofile","status":"notest","category":"filesystem"},{"name":"getcustomasset","status":"pass","category":"filesystem"},{"name":"fireclickdetector","status":"pass","category":"instances"},{"name":"getcallbackvalue","status":"pass","category":"instances"},{"name":"getconnections","status":"pass","category":"instances"},{"name":"gethiddenproperty","status":"pass","category":"instances"},{"name":"sethiddenproperty","status":"pass","category":"instances"},{"name":"gethui","status":"pass","category":"instances"},{"name":"getinstances","status":"pass","category":"instances"},{"name":"getnilinstances","status":"pass","category":"instances"},{"name":"isscriptable","status":"pass","category":"instances"},{"name":"setscriptable","status":"pass","category":"instances"},{"name":"setrbxclipboard","status":"notest","category":"instances"},{"name":"fireproximityprompt","status":"fail","category":"instances","message":"ProximityPrompt not supported"},{"name":"firetouchinterest","status":"pass","category":"instances"},{"name":"getrawmetatable","status":"pass","category":"metatable"},{"name":"hookmetamethod","status":"pass","category":"metatable"},{"name":"getnamecallmethod","status":"pass","category":"metatable"},{"name":"isreadonly","status":"pass","category":"metatable"},{"name":"setrawmetatable","status":"pass","category":"metatable"},{"name":"setreadonly","status":"pass","category":"metatable"},{"name":"getgc","status":"pass","category":"scripts"},{"name":"getgenv","status":"pass","category":"scripts"},{"name":"getloadedmodules","status":"pass","category":"scripts"},{"name":"getrenv","status":"pass","category":"scripts"},{"name":"getrunningscripts","status":"pass","category":"scripts"},{"name":"getscriptbytecode","status":"pass","category":"scripts","message":"4821 bytes"},{"name":"getscripthash","status":"pass","category":"scripts"},{"name":"getscripts","status":"pass","category":"scripts"},{"name":"getsenv","status":"pass","category":"scripts"},{"name":"getthreadidentity","status":"pass","category":"scripts","message":"Identity: 7"},{"name":"setthreadidentity","status":"pass","category":"scripts"},{"name":"getscriptclosure","status":"pass","category":"scripts"},{"name":"require","status":"pass","category":"scripts"},{"name":"Drawing","status":"pass","category":"drawing"},{"name":"Drawing.new","status":"pass","category":"drawing"},{"name":"Drawing.Fonts","status":"pass","category":"drawing"},{"name":"isrenderobj","status":"pass","category":"drawing"},{"name":"getrenderproperty","status":"pass","category":"drawing"},{"name":"setrenderproperty","status":"pass","category":"drawing"},{"name":"cleardrawcache","status":"pass","category":"drawing"},{"name":"WebSocket","status":"pass","category":"websocket"},{"name":"WebSocket.connect","status":"pass","category":"websocket","message":"echo confirmed"},{"name":"WebSocket.wss","status":"fail","category":"websocket","message":"WSS timed out after 5s"},{"name":"getactors","status":"fail","category":"actors","message":"global not found"},{"name":"run_on_actor","status":"fail","category":"actors","message":"global not found"},{"name":"Actor.SendMessage","status":"pass","category":"actors"},{"name":"Actor.BindToMessage","status":"pass","category":"actors"},{"name":"SharedTable","status":"fail","category":"actors","message":"SharedTable not supported"},{"name":"identifyexecutor","status":"pass","category":"misc","message":"Synapse X 2.1.0"},{"name":"lz4compress","status":"pass","category":"misc"},{"name":"lz4decompress","status":"pass","category":"misc"},{"name":"request","status":"pass","category":"misc"},{"name":"setfpscap","status":"pass","category":"misc","message":"~30fps at cap 30"},{"name":"getconnections_deep","status":"pass","category":"signal"},{"name":"connection.Disable_Enable","status":"pass","category":"signal"},{"name":"connection.Fire","status":"pass","category":"signal"},{"name":"connection.Function","status":"pass","category":"signal"},{"name":"connection.Thread","status":"pass","category":"signal"}]};
   demo.date = new Date().toLocaleDateString();
   renderResults(demo);
   var url = buildShareURL(demo);
   showShareBar(url);
   history.replaceState(null, '', '?r=' + encodeResults(demo));
 }
-
 window.addEventListener('load', function() {
   if (!loadFromURL()) {
     document.getElementById('empty-view').style.display = 'block';
   }
 });
-
 window.IFertLoad = function(data) {
   renderResults(data);
   var url = buildShareURL(data);
